@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/lib/i18n';
+import { IconPackage } from '@/lib/icons';
 
 function formatCFA(n) { return new Intl.NumberFormat('fr-FR').format(n); }
 
@@ -42,8 +43,8 @@ export default function ProductsPage() {
         <div className="product-grid">
           {filtered.map((product, i) => (
             <Link key={product.id} href={`/dashboard/products/${product.id}`} className="product-card">
-              <div className="product-card-img" style={{ background: bgColors[i % bgColors.length], display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36 }}>
-                📦
+              <div className="product-card-img" style={{ background: bgColors[i % bgColors.length], display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>
+                <IconPackage size={36} />
               </div>
               <div className="product-card-body">
                 <div className="product-card-name">{product.name}</div>
@@ -60,7 +61,7 @@ export default function ProductsPage() {
         </div>
       ) : (
         <div className="empty-state">
-          <div className="empty-state-icon">📦</div>
+          <div className="empty-state-icon"><IconPackage size={36} /></div>
           <h4>{t('noProducts')}</h4>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>{t('noProductsDesc')}</p>
           <Link href="/dashboard/products/new" className="btn btn-primary">{t('addProduct')}</Link>

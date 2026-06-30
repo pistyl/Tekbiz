@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
+import { IconStore, IconMapPin, IconTag, IconShoppingBag, IconShoppingCart, IconClipboard, IconCheckCircle, IconWave, IconCreditCard } from '@/lib/icons';
 
 function formatCFA(n) { return new Intl.NumberFormat('fr-FR').format(n); }
 
@@ -58,11 +59,15 @@ export default function ShopPage() {
     <div style={{ minHeight: '100vh', background: 'var(--bg-secondary)' }}>
       {/* Store Header */}
       <div style={{ background: 'var(--gradient-primary)', padding: '48px 16px 32px', textAlign: 'center', color: 'white' }}>
-        <div style={{ width: 64, height: 64, borderRadius: 'var(--radius-xl)', background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, margin: '0 auto 12px', border: '2px solid rgba(255,255,255,0.3)' }}>🏪</div>
+        <div style={{ width: 64, height: 64, borderRadius: 'var(--radius-xl)', background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', border: '2px solid rgba(255,255,255,0.3)' }}>
+          <IconStore size={28} color="white" />
+        </div>
         <h2 style={{ fontSize: '1.5rem', marginBottom: 4 }}>{mockStore.name}</h2>
         <p style={{ fontSize: '0.8125rem', opacity: 0.8 }}>{mockStore.description}</p>
-        <div style={{ marginTop: 8, display: 'inline-flex', gap: 4, background: 'rgba(255,255,255,0.15)', borderRadius: 'var(--radius-full)', padding: '4px 12px', fontSize: '0.6875rem', fontWeight: 600 }}>
-          📍 Dakar · 🏷️ {mockStore.category}
+        <div style={{ marginTop: 8, display: 'inline-flex', gap: 8, alignItems: 'center', background: 'rgba(255,255,255,0.15)', borderRadius: 'var(--radius-full)', padding: '4px 12px', fontSize: '0.6875rem', fontWeight: 600 }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3 }}><IconMapPin size={10} /> Dakar</span>
+          <span>·</span>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3 }}><IconTag size={10} /> {mockStore.category}</span>
         </div>
       </div>
 
@@ -72,7 +77,9 @@ export default function ShopPage() {
         <div className="product-grid">
           {mockProducts.map((p, i) => (
             <div key={p.id} className="product-card" onClick={() => setSelectedProduct(p)} style={{ cursor: 'pointer' }}>
-              <div className="product-card-img" style={{ background: bgColors[i % bgColors.length], display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36 }}>🛍️</div>
+              <div className="product-card-img" style={{ background: bgColors[i % bgColors.length], display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>
+                <IconShoppingBag size={36} />
+              </div>
               <div className="product-card-body">
                 <div className="product-card-name">{p.name}</div>
                 <div className="product-card-price">{formatCFA(p.price)} F</div>
@@ -85,8 +92,8 @@ export default function ShopPage() {
       {/* Floating Cart Button */}
       {cart.length > 0 && !showCart && !selectedProduct && !showCheckout && !orderDone && (
         <div style={{ position: 'fixed', bottom: 20, left: 16, right: 16, zIndex: 50 }}>
-          <button onClick={() => setShowCart(true)} className="btn btn-primary btn-full btn-lg" style={{ justifyContent: 'space-between', fontSize: '0.9375rem' }}>
-            <span>🛒 Panier ({cartCount})</span>
+          <button onClick={() => setShowCart(true)} className="btn btn-primary btn-full btn-lg" style={{ justifyContent: 'space-between', fontSize: '0.9375rem', gap: 8 }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><IconShoppingCart size={18} /> Panier ({cartCount})</span>
             <span>{formatCFA(cartTotal)} F</span>
           </button>
         </div>
@@ -98,12 +105,14 @@ export default function ShopPage() {
           <div className="modal-overlay" onClick={() => setSelectedProduct(null)} />
           <div className="bottom-sheet">
             <div className="bottom-sheet-handle" />
-            <div style={{ width: '100%', height: 200, background: bgColors[mockProducts.indexOf(selectedProduct) % bgColors.length], borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 64, marginBottom: 16 }}>🛍️</div>
+            <div style={{ width: '100%', height: 200, background: bgColors[mockProducts.indexOf(selectedProduct) % bgColors.length], borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16, color: '#94a3b8' }}>
+              <IconShoppingBag size={64} />
+            </div>
             <h3 style={{ marginBottom: 4 }}>{selectedProduct.name}</h3>
             <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', fontWeight: 800, color: 'var(--primary)', marginBottom: 12 }}>{formatCFA(selectedProduct.price)} F</div>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', lineHeight: 1.6, marginBottom: 20 }}>{selectedProduct.description}</p>
-            <button onClick={() => addToCart(selectedProduct)} className="btn btn-primary btn-full btn-lg">
-              🛒 Ajouter au panier
+            <button onClick={() => addToCart(selectedProduct)} className="btn btn-primary btn-full btn-lg" style={{ gap: 8 }}>
+              <IconShoppingCart size={18} /> Ajouter au panier
             </button>
           </div>
         </>
@@ -115,7 +124,7 @@ export default function ShopPage() {
           <div className="modal-overlay" onClick={() => setShowCart(false)} />
           <div className="bottom-sheet">
             <div className="bottom-sheet-handle" />
-            <h4 style={{ marginBottom: 16 }}>🛒 Panier ({cartCount} articles)</h4>
+            <h4 style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}><IconShoppingCart size={18} /> Panier ({cartCount} articles)</h4>
             {cart.map(item => (
               <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: '1px solid var(--border-light)' }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -147,7 +156,7 @@ export default function ShopPage() {
           <div className="modal-overlay" onClick={() => setShowCheckout(false)} />
           <div className="bottom-sheet">
             <div className="bottom-sheet-handle" />
-            <h4 style={{ marginBottom: 16 }}>📋 Finaliser la commande</h4>
+            <h4 style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}><IconClipboard size={18} /> Finaliser la commande</h4>
             <form onSubmit={handleOrder} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div className="input-group">
                 <label>Nom complet</label>
@@ -164,10 +173,10 @@ export default function ShopPage() {
               <div className="input-group">
                 <label>Payer avec</label>
                 <div style={{ display: 'flex', gap: 10 }}>
-                  {[{ key: 'wave', label: '🌊 Wave', bg: '#EFF6FF' }, { key: 'orange_money', label: '🟠 Orange Money', bg: '#FFF7ED' }].map(m => (
+                  {[{ key: 'wave', label: 'Wave', icon: <IconWave size={16} />, bg: '#EFF6FF' }, { key: 'orange_money', label: 'Orange Money', icon: <IconCreditCard size={16} />, bg: '#FFF7ED' }].map(m => (
                     <button key={m.key} type="button" onClick={() => setCheckoutForm(p => ({ ...p, payment: m.key }))}
-                      style={{ flex: 1, padding: '14px 8px', borderRadius: 'var(--radius-md)', border: `2px solid ${checkoutForm.payment === m.key ? 'var(--primary)' : 'var(--border)'}`, background: checkoutForm.payment === m.key ? m.bg : 'var(--bg)', fontSize: '0.8125rem', fontWeight: 600, transition: 'all 0.2s' }}>
-                      {m.label}
+                      style={{ flex: 1, padding: '14px 8px', borderRadius: 'var(--radius-md)', border: `2px solid ${checkoutForm.payment === m.key ? 'var(--primary)' : 'var(--border)'}`, background: checkoutForm.payment === m.key ? m.bg : 'var(--bg)', fontSize: '0.8125rem', fontWeight: 600, transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                      {m.icon} {m.label}
                     </button>
                   ))}
                 </div>
@@ -190,7 +199,9 @@ export default function ShopPage() {
           <div className="modal-overlay" onClick={() => setOrderDone(false)} />
           <div className="bottom-sheet" style={{ textAlign: 'center' }}>
             <div className="bottom-sheet-handle" />
-            <div style={{ fontSize: 64, marginBottom: 12 }}>🎉</div>
+            <div style={{ marginBottom: 12, color: 'var(--success)', display: 'flex', justifyContent: 'center' }}>
+              <IconCheckCircle size={64} />
+            </div>
             <h3 style={{ marginBottom: 8 }}>Commande confirmée !</h3>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginBottom: 16 }}>
               Votre commande a été envoyée au vendeur. Vous serez contacté pour la livraison.

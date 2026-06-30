@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/lib/i18n';
 import { getSession, logout } from '@/lib/auth';
+import { IconCamera, IconStore, IconGlobe, IconEye, IconLogOut } from '@/lib/icons';
 
 export default function StorePage() {
   const { t } = useLanguage();
@@ -71,9 +72,11 @@ export default function StorePage() {
       <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         {/* Banner & Logo */}
         <div style={{ width: '100%', height: 120, background: 'var(--gradient-primary)', borderRadius: 'var(--radius-lg)', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <span style={{ color: 'white', fontSize: '0.8125rem', fontWeight: 500, opacity: 0.8 }}>📷 Bannière</span>
-          <div style={{ position: 'absolute', bottom: -24, left: 16, width: 56, height: 56, borderRadius: 'var(--radius-lg)', background: 'var(--surface)', border: '3px solid var(--surface)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, boxShadow: 'var(--shadow-md)' }}>
-            🏪
+          <span style={{ color: 'white', fontSize: '0.8125rem', fontWeight: 500, opacity: 0.8, display: 'flex', alignItems: 'center', gap: 6 }}>
+            <IconCamera size={16} color="white" /> Bannière
+          </span>
+          <div style={{ position: 'absolute', bottom: -24, left: 16, width: 56, height: 56, borderRadius: 'var(--radius-lg)', background: 'var(--surface)', border: '3px solid var(--surface)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: 'var(--shadow-md)', color: 'var(--primary)' }}>
+            <IconStore size={24} />
           </div>
         </div>
 
@@ -113,8 +116,8 @@ export default function StorePage() {
             <div style={{ fontWeight: 600 }}>{t('language')}</div>
             <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>Français / Wolof</div>
           </div>
-          <button type="button" className="btn btn-ghost btn-sm" style={{ fontWeight: 600, color: 'var(--primary)' }}>
-            🌍 {t('french')}
+          <button type="button" className="btn btn-ghost btn-sm" style={{ fontWeight: 600, color: 'var(--primary)', gap: 6 }}>
+            <IconGlobe size={14} /> {t('french')}
           </button>
         </div>
 
@@ -125,14 +128,14 @@ export default function StorePage() {
 
         {/* Store Link */}
         {form.slug && (
-          <a href={`/shop/${form.slug}`} target="_blank" rel="noopener noreferrer" className="btn btn-secondary btn-full" style={{ textAlign: 'center' }}>
-            👁️ Voir ma boutique — {form.slug}.tekbiz.sn
+          <a href={`/shop/${form.slug}`} target="_blank" rel="noopener noreferrer" className="btn btn-secondary btn-full" style={{ textAlign: 'center', gap: 6 }}>
+            <IconEye size={16} /> Voir ma boutique — {form.slug}.tekbiz.sn
           </a>
         )}
 
         {/* Logout */}
-        <button type="button" className="btn btn-ghost btn-full" style={{ color: 'var(--danger)', marginTop: 8 }} onClick={handleLogout}>
-          🚪 Déconnexion
+        <button type="button" className="btn btn-ghost btn-full" style={{ color: 'var(--danger)', marginTop: 8, gap: 6 }} onClick={handleLogout}>
+          <IconLogOut size={16} /> Déconnexion
         </button>
       </form>
     </div>

@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { LanguageProvider, useLanguage } from '@/lib/i18n';
+import { IconRocket, IconZap, IconWallet, IconChart, IconEdit, IconCamera, IconParty, IconHome, IconPackage, IconClipboard, IconDollar, IconUser, IconCheck } from '@/lib/icons';
 
 function LangToggle() {
   const { lang, toggleLang, t } = useLanguage();
@@ -15,7 +16,6 @@ function LangToggle() {
 
 function Navbar() {
   const { t } = useLanguage();
-  const [open, setOpen] = useState(false);
   return (
     <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(16px)', borderBottom: '1px solid var(--border-light)' }}>
       <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64 }}>
@@ -39,8 +39,8 @@ function HeroSection() {
       <div style={{ position: 'absolute', top: '20%', right: '-10%', width: 400, height: 400, background: 'radial-gradient(circle, rgba(249,115,22,0.15) 0%, transparent 70%)', borderRadius: '50%' }} />
       <div style={{ position: 'absolute', bottom: '10%', left: '-5%', width: 300, height: 300, background: 'radial-gradient(circle, rgba(6,182,212,0.1) 0%, transparent 70%)', borderRadius: '50%' }} />
       <div className="container" style={{ textAlign: 'center', position: 'relative', zIndex: 1, padding: '40px 16px' }}>
-        <div style={{ display: 'inline-block', background: 'rgba(249,115,22,0.15)', border: '1px solid rgba(249,115,22,0.3)', borderRadius: 'var(--radius-full)', padding: '6px 16px', fontSize: '0.8125rem', fontWeight: 600, color: 'var(--primary-light)', marginBottom: 24 }}>
-          🚀 La plateforme #1 au Sénégal
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(249,115,22,0.15)', border: '1px solid rgba(249,115,22,0.3)', borderRadius: 'var(--radius-full)', padding: '6px 16px', fontSize: '0.8125rem', fontWeight: 600, color: 'var(--primary-light)', marginBottom: 24 }}>
+          <IconRocket size={14} color="var(--primary-light)" /> La plateforme #1 au Sénégal
         </div>
         <h1 style={{ fontSize: 'clamp(2rem, 6vw, 4rem)', maxWidth: 700, margin: '0 auto 20px', lineHeight: 1.1, fontWeight: 900 }}>
           {t('heroTitle')}
@@ -85,11 +85,13 @@ function HeroSection() {
                   </div>
                 ))}
               </div>
-              {/* Mock bottom nav */}
+              {/* Mock bottom nav with icons */}
               <div style={{ height: 36, borderTop: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'space-around', padding: '0 8px' }}>
-                {['🏠', '📦', '📋', '💰', '👤'].map((e, i) => (
-                  <span key={i} style={{ fontSize: 12, opacity: i === 0 ? 1 : 0.4 }}>{e}</span>
-                ))}
+                <IconHome size={12} color="#F97316" />
+                <IconPackage size={12} color="#94a3b8" />
+                <IconClipboard size={12} color="#94a3b8" />
+                <IconDollar size={12} color="#94a3b8" />
+                <IconUser size={12} color="#94a3b8" />
               </div>
             </div>
           </div>
@@ -102,17 +104,17 @@ function HeroSection() {
 function FeaturesSection() {
   const { t } = useLanguage();
   const features = [
-    { icon: '⚡', title: t('feature1Title'), desc: t('feature1Desc'), color: '#F97316' },
-    { icon: '💸', title: t('feature2Title'), desc: t('feature2Desc'), color: '#10B981' },
-    { icon: '📊', title: t('feature3Title'), desc: t('feature3Desc'), color: '#3B82F6' },
+    { icon: <IconZap size={28} />, title: t('feature1Title'), desc: t('feature1Desc'), color: '#F97316' },
+    { icon: <IconWallet size={28} />, title: t('feature2Title'), desc: t('feature2Desc'), color: '#10B981' },
+    { icon: <IconChart size={28} />, title: t('feature3Title'), desc: t('feature3Desc'), color: '#3B82F6' },
   ];
   return (
     <section style={{ padding: '80px 0', background: 'var(--bg)' }}>
       <div className="container">
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24 }}>
           {features.map((f, i) => (
-            <div key={i} className="card" style={{ textAlign: 'center', padding: 32, borderTop: `3px solid ${f.color}` }}>
-              <div style={{ width: 64, height: 64, borderRadius: 'var(--radius-lg)', background: `${f.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, margin: '0 auto 16px' }}>{f.icon}</div>
+            <div key={i} className="card card-interactive" style={{ textAlign: 'center', padding: 32, borderTop: `3px solid ${f.color}` }}>
+              <div style={{ width: 64, height: 64, borderRadius: 'var(--radius-lg)', background: `${f.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: f.color, margin: '0 auto 16px' }}>{f.icon}</div>
               <h3 style={{ marginBottom: 8 }}>{f.title}</h3>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.9375rem', lineHeight: 1.6 }}>{f.desc}</p>
             </div>
@@ -126,9 +128,9 @@ function FeaturesSection() {
 function StepsSection() {
   const { t } = useLanguage();
   const steps = [
-    { num: '01', title: t('step1'), desc: t('step1Desc'), icon: '📝' },
-    { num: '02', title: t('step2'), desc: t('step2Desc'), icon: '📸' },
-    { num: '03', title: t('step3'), desc: t('step3Desc'), icon: '🎉' },
+    { num: '01', title: t('step1'), desc: t('step1Desc'), icon: <IconEdit size={24} color="white" /> },
+    { num: '02', title: t('step2'), desc: t('step2Desc'), icon: <IconCamera size={24} color="white" /> },
+    { num: '03', title: t('step3'), desc: t('step3Desc'), icon: <IconParty size={24} color="white" /> },
   ];
   return (
     <section style={{ padding: '80px 0', background: 'var(--bg-secondary)' }}>
@@ -137,7 +139,7 @@ function StepsSection() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 32, maxWidth: 500, margin: '0 auto' }}>
           {steps.map((s, i) => (
             <div key={i} style={{ display: 'flex', gap: 20, alignItems: 'flex-start' }}>
-              <div style={{ width: 56, height: 56, borderRadius: 'var(--radius-lg)', background: 'var(--gradient-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, flexShrink: 0, boxShadow: 'var(--shadow-float)' }}>
+              <div style={{ width: 56, height: 56, borderRadius: 'var(--radius-lg)', background: 'var(--gradient-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: 'var(--shadow-float)' }}>
                 {s.icon}
               </div>
               <div>
@@ -168,7 +170,7 @@ function PricingSection() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24 }}>
               {[t('upTo20Products'), t('mobilePayments'), t('orderManagement')].map((f, i) => (
                 <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: '0.875rem' }}>
-                  <span style={{ color: 'var(--success)' }}>✓</span> {f}
+                  <IconCheck size={16} color="var(--success)" /> {f}
                 </div>
               ))}
             </div>
@@ -182,7 +184,7 @@ function PricingSection() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24 }}>
               {[t('unlimitedProducts'), t('mobilePayments'), t('orderManagement'), t('customDomain'), t('analytics'), t('prioritySupport'), t('noCommission')].map((f, i) => (
                 <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: '0.875rem' }}>
-                  <span style={{ color: 'var(--success)' }}>✓</span> {f}
+                  <IconCheck size={16} color="var(--success)" /> {f}
                 </div>
               ))}
             </div>

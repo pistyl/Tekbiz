@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { LanguageProvider, useLanguage } from '@/lib/i18n';
 import { login, isLoggedIn } from '@/lib/auth';
+import { IconWarning, IconEye, IconEyeOff } from '@/lib/icons';
 
 function LoginForm() {
   const { t } = useLanguage();
@@ -48,7 +49,7 @@ function LoginForm() {
         {/* Error message */}
         {error && (
           <div style={{ background: 'var(--danger-bg)', color: 'var(--danger)', padding: '10px 14px', borderRadius: 'var(--radius-md)', fontSize: '0.8125rem', fontWeight: 500, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
-            ⚠️ {error}
+            <IconWarning size={16} /> {error}
           </div>
         )}
 
@@ -63,8 +64,8 @@ function LoginForm() {
               <label htmlFor="login-password">{t('password')}</label>
               <div style={{ position: 'relative' }}>
                 <input id="login-password" type={showPw ? 'text' : 'password'} className="input" placeholder="••••••••" value={password} onChange={e => { setError(''); setPassword(e.target.value); }} required style={{ paddingRight: 48 }} />
-                <button type="button" onClick={() => setShowPw(!showPw)} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-tertiary)', fontSize: '0.75rem', fontWeight: 600 }}>
-                  {showPw ? '🙈' : '👁️'}
+                <button type="button" onClick={() => setShowPw(!showPw)} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-tertiary)', display: 'flex', alignItems: 'center' }}>
+                  {showPw ? <IconEyeOff size={18} /> : <IconEye size={18} />}
                 </button>
               </div>
             </div>

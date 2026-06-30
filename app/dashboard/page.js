@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/lib/i18n';
 import { getSession } from '@/lib/auth';
+import { IconDollar, IconPackage, IconTrendUp, IconTag, IconLink, IconHand } from '@/lib/icons';
 
 const mockOrders = [
   { id: 'TK-2401', customer: 'Aminata Sow', items: 3, total: 45000, status: 'pending', time: '12 min' },
@@ -27,18 +28,23 @@ export default function DashboardHome() {
   const userName = session?.name?.split(' ')[0] || '...';
 
   const stats = [
-    { label: t('todaySales'), value: `${formatCFA(127500)}`, trend: '+12%', up: true, icon: '💰' },
-    { label: t('pendingOrders'), value: '8', trend: '+3', up: true, icon: '📦' },
-    { label: t('monthRevenue'), value: `${formatCFA(2450000)}`, trend: '+24%', up: true, icon: '📈' },
-    { label: t('totalProducts'), value: '47', trend: '', up: true, icon: '🏷️' },
+    { label: t('todaySales'), value: `${formatCFA(127500)}`, trend: '+12%', up: true, icon: <IconDollar size={20} />, color: '#10B981' },
+    { label: t('pendingOrders'), value: '8', trend: '+3', up: true, icon: <IconPackage size={20} />, color: '#F97316' },
+    { label: t('monthRevenue'), value: `${formatCFA(2450000)}`, trend: '+24%', up: true, icon: <IconTrendUp size={20} />, color: '#3B82F6' },
+    { label: t('totalProducts'), value: '47', trend: '', up: true, icon: <IconTag size={20} />, color: '#8B5CF6' },
   ];
 
   return (
     <div style={{ padding: 16 }}>
       {/* Welcome */}
-      <div style={{ marginBottom: 20 }}>
-        <h3 style={{ fontSize: '1.25rem' }}>👋 Salut, {userName} !</h3>
-        <p style={{ color: 'var(--text-tertiary)', fontSize: '0.8125rem' }}>Voici le résumé de votre journée</p>
+      <div style={{ marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ width: 40, height: 40, borderRadius: 'var(--radius-md)', background: 'var(--bg-tertiary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)' }}>
+          <IconHand size={22} />
+        </div>
+        <div>
+          <h3 style={{ fontSize: '1.25rem' }}>Salut, {userName} !</h3>
+          <p style={{ color: 'var(--text-tertiary)', fontSize: '0.8125rem' }}>Voici le résumé de votre journée</p>
+        </div>
       </div>
 
       {/* Stats Grid */}
@@ -47,7 +53,9 @@ export default function DashboardHome() {
           <div key={i} className="stats-card">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <span className="stats-card-label">{s.label}</span>
-              <span style={{ fontSize: 20 }}>{s.icon}</span>
+              <div style={{ width: 36, height: 36, borderRadius: 'var(--radius-md)', background: `${s.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: s.color }}>
+                {s.icon}
+              </div>
             </div>
             <div className="stats-card-value">{s.value}</div>
             {s.trend && <div className={`stats-card-trend ${s.up ? 'up' : 'down'}`}>{s.up ? '↑' : '↓'} {s.trend}</div>}
@@ -62,8 +70,8 @@ export default function DashboardHome() {
           <Link href="/dashboard/products/new" className="btn btn-primary" style={{ flex: 1, fontSize: '0.8125rem' }}>
             + {t('addProduct')}
           </Link>
-          <button className="btn btn-secondary" style={{ flex: 1, fontSize: '0.8125rem' }} onClick={() => { const slug = session?.store?.slug || 'ma-boutique'; const name = session?.store?.name || 'Ma Boutique'; if (navigator.share) { navigator.share({ title: name, url: `https://${slug}.tekbiz.sn` }); } else { navigator.clipboard.writeText(`https://${slug}.tekbiz.sn`); alert('Lien copié !'); } }}>
-            🔗 {t('shareStore')}
+          <button className="btn btn-secondary" style={{ flex: 1, fontSize: '0.8125rem', gap: 6 }} onClick={() => { const slug = session?.store?.slug || 'ma-boutique'; const name = session?.store?.name || 'Ma Boutique'; if (navigator.share) { navigator.share({ title: name, url: `https://${slug}.tekbiz.sn` }); } else { navigator.clipboard.writeText(`https://${slug}.tekbiz.sn`); alert('Lien copié !'); } }}>
+            <IconLink size={14} /> {t('shareStore')}
           </button>
         </div>
       </div>

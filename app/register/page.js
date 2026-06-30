@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { LanguageProvider, useLanguage } from '@/lib/i18n';
 import { register, isLoggedIn } from '@/lib/auth';
+import { IconWarning, IconLink } from '@/lib/icons';
 
 const categories = [
   'Mode & Vêtements', 'Électronique', 'Alimentation', 'Beauté & Cosmétiques',
@@ -75,7 +76,7 @@ function RegisterForm() {
         {/* Error message */}
         {error && (
           <div style={{ background: 'var(--danger-bg)', color: 'var(--danger)', padding: '10px 14px', borderRadius: 'var(--radius-md)', fontSize: '0.8125rem', fontWeight: 500, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
-            ⚠️ {error}
+            <IconWarning size={16} /> {error}
           </div>
         )}
 
@@ -114,9 +115,12 @@ function RegisterForm() {
                     {categories.map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
-                <div style={{ background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)', padding: 16, fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
-                  🔗 Votre boutique sera accessible à :<br />
-                  <strong style={{ color: 'var(--primary)' }}>{form.storeName ? form.storeName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') : 'ma-boutique'}.tekbiz.sn</strong>
+                <div style={{ background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)', padding: 16, fontSize: '0.875rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+                  <IconLink size={16} style={{ flexShrink: 0, marginTop: 2 }} />
+                  <div>
+                    Votre boutique sera accessible à :<br />
+                    <strong style={{ color: 'var(--primary)' }}>{form.storeName ? form.storeName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') : 'ma-boutique'}.tekbiz.sn</strong>
+                  </div>
                 </div>
                 <div style={{ display: 'flex', gap: 12 }}>
                   <button type="button" className="btn btn-secondary" onClick={() => setStep(1)} style={{ flex: 1 }}>← {t('back')}</button>

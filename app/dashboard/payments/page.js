@@ -1,5 +1,6 @@
 'use client';
 import { useLanguage } from '@/lib/i18n';
+import { IconWave, IconCreditCard } from '@/lib/icons';
 
 function formatCFA(n) { return new Intl.NumberFormat('fr-FR').format(n); }
 
@@ -33,8 +34,8 @@ export default function PaymentsPage() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         {mockPayments.map(p => (
           <div key={p.id} className="card" style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 14 }}>
-            <div style={{ width: 40, height: 40, borderRadius: 'var(--radius-md)', background: p.method === 'wave' ? '#EFF6FF' : '#FFF7ED', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>
-              {p.method === 'wave' ? '🌊' : '🟠'}
+            <div style={{ width: 40, height: 40, borderRadius: 'var(--radius-md)', background: p.method === 'wave' ? '#EFF6FF' : '#FFF7ED', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: p.method === 'wave' ? '#3B82F6' : '#F97316' }}>
+              {p.method === 'wave' ? <IconWave size={20} /> : <IconCreditCard size={20} />}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>{p.method === 'wave' ? 'Wave' : 'Orange Money'}</div>

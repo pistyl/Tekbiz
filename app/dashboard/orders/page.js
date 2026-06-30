@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useLanguage } from '@/lib/i18n';
+import { IconClipboard, IconWave, IconCreditCard, IconMessageCircle } from '@/lib/icons';
 
 function formatCFA(n) { return new Intl.NumberFormat('fr-FR').format(n); }
 
@@ -58,7 +59,7 @@ export default function OrdersPage() {
 
       {filtered.length === 0 && (
         <div className="empty-state">
-          <div className="empty-state-icon">📋</div>
+          <div className="empty-state-icon"><IconClipboard size={36} /></div>
           <h4>{t('noOrders')}</h4>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>{t('noOrdersDesc')}</p>
         </div>
@@ -80,8 +81,8 @@ export default function OrdersPage() {
             <div style={{ background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)', padding: 14, marginBottom: 16 }}>
               <div style={{ fontWeight: 600, marginBottom: 4 }}>{selectedOrder.customer}</div>
               <div style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>{selectedOrder.phone}</div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginTop: 4 }}>
-                {selectedOrder.payment === 'wave' ? '🌊 Wave' : '🟠 Orange Money'}
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginTop: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
+                {selectedOrder.payment === 'wave' ? <><IconWave size={14} /> Wave</> : <><IconCreditCard size={14} /> Orange Money</>}
               </div>
             </div>
 
@@ -100,8 +101,8 @@ export default function OrdersPage() {
             </div>
 
             <div style={{ display: 'flex', gap: 10 }}>
-              <a href={`https://wa.me/${selectedOrder.phone.replace(/\s+/g, '')}`} className="btn btn-secondary" style={{ flex: 1 }} target="_blank" rel="noopener">
-                💬 WhatsApp
+              <a href={`https://wa.me/${selectedOrder.phone.replace(/\s+/g, '')}`} className="btn btn-secondary" style={{ flex: 1, gap: 6 }} target="_blank" rel="noopener">
+                <IconMessageCircle size={16} /> WhatsApp
               </a>
               <button className="btn btn-primary" style={{ flex: 1 }}>{t('updateStatus')}</button>
             </div>
