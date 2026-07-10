@@ -150,19 +150,6 @@ export default function DashboardHome() {
         </div>
       </div>
 
-      {/* Somme Totale Historique des Ventes (Grand Encadré Premium) */}
-      <div style={{ background: 'var(--gradient-primary)', borderRadius: 'var(--radius-lg)', padding: '20px 16px', color: 'white', marginBottom: 20, boxShadow: 'var(--shadow-md)' }}>
-        <div style={{ fontSize: '0.75rem', opacity: 0.85, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-          Chiffre d'Affaires Global (Commandes Validées)
-        </div>
-        <div style={{ fontSize: '1.875rem', fontWeight: 800, marginTop: 4, fontFamily: 'var(--font-display)' }}>
-          {formatCFA(globalTotalSales)} F
-        </div>
-        <div style={{ fontSize: '0.6875rem', opacity: 0.75, marginTop: 8 }}>
-          Exclut les commandes en attente (PENDING) et annulées (CANCELLED)
-        </div>
-      </div>
-
       {/* Filtre de date personnalisé (Permanent, sans layout shift ni dropdown instable) */}
       <div 
         style={{ 
@@ -292,6 +279,20 @@ export default function DashboardHome() {
           </div>
         </div>
       </div>
+
+      {/* Somme Totale Historique des Ventes (Grand Encadré Premium) */}
+      <div style={{ background: 'var(--gradient-primary)', borderRadius: 'var(--radius-lg)', padding: '20px 16px', color: 'white', marginBottom: 20, boxShadow: 'var(--shadow-md)' }}>
+        <div style={{ fontSize: '0.75rem', opacity: 0.85, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          Chiffre d'Affaires Global (Commandes Validées)
+        </div>
+        <div style={{ fontSize: '1.875rem', fontWeight: 800, marginTop: 4, fontFamily: 'var(--font-display)' }}>
+          {formatCFA(globalTotalSales)} F
+        </div>
+        <div style={{ fontSize: '0.6875rem', opacity: 0.75, marginTop: 8 }}>
+          Exclut les commandes en attente (PENDING) et annulées (CANCELLED)
+        </div>
+      </div>
+
 
       {/* Stats Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, marginBottom: 24 }}>
