@@ -1,5 +1,4 @@
 'use client';
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { LanguageProvider, useLanguage } from '@/lib/i18n';
 import { IconRocket, IconZap, IconWallet, IconChart, IconEdit, IconCamera, IconParty, IconHome, IconPackage, IconClipboard, IconDollar, IconUser, IconCheck } from '@/lib/icons';
@@ -223,59 +222,6 @@ function LandingContent() {
 }
 
 export default function Home() {
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1200);
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (loading) {
-    return (
-      <div style={{
-        position: 'fixed',
-        inset: 0,
-        background: '#0F172A',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 9999
-      }}>
-        <style dangerouslySetInnerHTML={{ __html: ``
-          @keyframes loader-pulse {
-            0%, 100% { transform: scale(0.95); opacity: 0.7; }
-            50% { transform: scale(1.03); opacity: 1; }
-          }
-          @keyframes loader-spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-        `}} />
-        <div style={{
-          fontFamily: 'var(--font-display)',
-          fontWeight: 900,
-          fontSize: '2.5rem',
-          letterSpacing: '0.05em',
-          marginBottom: 20,
-          animation: 'loader-pulse 1.5s ease-in-out infinite'
-        }}>
-          <span style={{ background: 'linear-gradient(135deg, #F97316 0%, #F59E0B 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>TEKBIZ</span>
-        </div>
-        <div style={{
-          width: 32,
-          height: 32,
-          border: '3px solid rgba(249, 115, 22, 0.15)',
-          borderTop: '3px solid #F97316',
-          borderRadius: '50%',
-          animation: 'loader-spin 0.8s linear infinite'
-        }} />
-      </div>
-    );
-  }
-
   return (
     <LanguageProvider>
       <LandingContent />
