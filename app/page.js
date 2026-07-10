@@ -4,11 +4,29 @@ import { LanguageProvider, useLanguage } from '@/lib/i18n';
 import { IconRocket, IconZap, IconWallet, IconChart, IconEdit, IconCamera, IconParty, IconHome, IconPackage, IconClipboard, IconDollar, IconUser, IconCheck } from '@/lib/icons';
 
 function LangToggle() {
-  const { lang, toggleLang, t } = useLanguage();
+  const { lang, toggleLang } = useLanguage();
   return (
-    <button onClick={toggleLang} className="btn btn-ghost btn-sm" style={{ gap: 6 }}>
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-      {lang === 'fr' ? 'Wolof' : 'Français'}
+    <button 
+      onClick={toggleLang} 
+      style={{
+        background: 'rgba(255, 255, 255, 0.08)',
+        border: 'none',
+        borderRadius: '20px',
+        padding: '6px 14px',
+        color: '#94A3B8',
+        fontSize: '0.75rem',
+        fontWeight: 700,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 6,
+        cursor: 'pointer',
+        fontFamily: 'var(--font-sans)',
+        transition: 'all 0.2s ease'
+      }}
+    >
+      <span style={{ color: lang === 'fr' ? '#fff' : 'rgba(255,255,255,0.4)', transition: 'color 0.2s' }}>FR</span>
+      <span style={{ color: 'rgba(255, 255, 255, 0.15)' }}>|</span>
+      <span style={{ color: lang === 'wo' ? '#fff' : 'rgba(255,255,255,0.4)', transition: 'color 0.2s' }}>WO</span>
     </button>
   );
 }
@@ -16,14 +34,54 @@ function LangToggle() {
 function Navbar() {
   const { t } = useLanguage();
   return (
-    <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(16px)', borderBottom: '1px solid var(--border-light)', paddingTop: 'env(safe-area-inset-top, 0px)' }}>
-      <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64 }}>
-        <Link href="/" style={{ fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ background: 'var(--gradient-primary)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>TEKBIZ</span>
+    <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, background: 'rgba(9, 15, 28, 0.8)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(255, 255, 255, 0.05)', paddingTop: 'env(safe-area-inset-top, 0px)' }}>
+      <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64, padding: '0 16px' }}>
+        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
+          <div style={{
+            width: 38,
+            height: 38,
+            borderRadius: '10px',
+            background: '#090F1C',
+            border: '1.5px solid rgba(16, 185, 129, 0.25)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+            gap: 1
+          }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="url(#bag-grad-nav)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <defs>
+                <linearGradient id="bag-grad-nav" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#F97316" />
+                  <stop offset="100%" stopColor="#F59E0B" />
+                </linearGradient>
+              </defs>
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <path d="M16 10a4 4 0 0 1-8 0" />
+            </svg>
+            <span style={{ fontSize: '6px', fontWeight: 900, color: '#22D3EE', letterSpacing: '0.5px', lineHeight: 1 }}>TEKBIZ</span>
+          </div>
         </Link>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <LangToggle />
-          <Link href="/login" className="btn btn-primary btn-sm">{t('commencer')}</Link>
+          <Link href="/login" style={{
+            background: 'var(--gradient-primary)',
+            border: 'none',
+            borderRadius: '20px',
+            padding: '8px 18px',
+            color: '#fff',
+            fontSize: '0.8125rem',
+            fontWeight: 600,
+            textDecoration: 'none',
+            boxShadow: '0 2px 8px rgba(249, 115, 22, 0.25)',
+            display: 'inline-flex',
+            alignItems: 'center',
+            fontFamily: 'var(--font-sans)'
+          }}>
+            {t('commencer')}
+          </Link>
         </div>
       </div>
     </nav>
@@ -32,67 +90,101 @@ function Navbar() {
 
 function HeroSection() {
   const { t } = useLanguage();
+  const titleParts = t('heroTitle').split(',');
+  const firstPart = titleParts[0] ? titleParts[0] + ',' : '';
+  const secondPart = titleParts[1] ? titleParts[1].trim() : '';
+
   return (
-    <section style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', background: 'var(--gradient-hero)', color: 'white', paddingTop: 80, position: 'relative', overflow: 'hidden' }}>
-      <div style={{ position: 'absolute', top: '20%', right: '-10%', width: 400, height: 400, background: 'radial-gradient(circle, rgba(249,115,22,0.15) 0%, transparent 70%)', borderRadius: '50%' }} />
-      <div style={{ position: 'absolute', bottom: '10%', left: '-5%', width: 300, height: 300, background: 'radial-gradient(circle, rgba(6,182,212,0.1) 0%, transparent 70%)', borderRadius: '50%' }} />
-      <div className="container" style={{ textAlign: 'center', position: 'relative', zIndex: 1, padding: '40px 16px' }}>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(249,115,22,0.15)', border: '1px solid rgba(249,115,22,0.3)', borderRadius: 'var(--radius-full)', padding: '6px 16px', fontSize: '0.8125rem', fontWeight: 600, color: 'var(--primary-light)', marginBottom: 24 }}>
-          <IconRocket size={14} color="var(--primary-light)" /> La plateforme #1 au Sénégal
-        </div>
-        <h1 style={{ fontSize: 'clamp(2rem, 6vw, 4rem)', maxWidth: 700, margin: '0 auto 20px', lineHeight: 1.1, fontWeight: 900 }}>
-          {t('heroTitle')}
+    <section style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', background: '#030712', color: 'white', paddingTop: 100, paddingBottom: 60, position: 'relative', overflow: 'hidden' }}>
+      {/* Background gradients */}
+      <div style={{ position: 'absolute', top: '10%', right: '-10%', width: 350, height: 350, background: 'radial-gradient(circle, rgba(249,115,22,0.06) 0%, transparent 70%)', borderRadius: '50%', pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', bottom: '10%', left: '-10%', width: 350, height: 350, background: 'radial-gradient(circle, rgba(16,185,129,0.04) 0%, transparent 70%)', borderRadius: '50%', pointerEvents: 'none' }} />
+      
+      <div className="container" style={{ textAlign: 'center', position: 'relative', zIndex: 1, padding: '20px 16px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <h1 style={{ fontSize: 'clamp(2.25rem, 6vw, 3.75rem)', fontWeight: 800, fontFamily: 'var(--font-display)', marginBottom: 20, lineHeight: 1.15, letterSpacing: '-0.02em', maxWidth: 700 }}>
+          {firstPart}
+          {secondPart && <><br /><span style={{ background: 'var(--gradient-primary)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{secondPart}</span></>}
         </h1>
-        <p style={{ fontSize: 'clamp(1rem, 2.5vw, 1.25rem)', maxWidth: 560, margin: '0 auto 36px', color: 'rgba(255,255,255,0.7)', lineHeight: 1.6 }}>
+        
+        <p style={{ fontSize: 'clamp(0.95rem, 2.5vw, 1.0625rem)', maxWidth: 440, margin: '0 auto 32px', color: 'rgba(255,255,255,0.7)', lineHeight: 1.6, fontWeight: 400 }}>
           {t('heroSubtitle')}
         </p>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center' }}>
-          <Link href="/register" className="btn btn-primary btn-lg" style={{ fontSize: '1.0625rem', minWidth: 280 }}>
-            {t('getStarted')}
+        
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14, alignItems: 'center', width: '100%', maxWidth: '340px', margin: '0 auto 24px' }}>
+          <Link href="/register" style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: 52,
+            borderRadius: '14px',
+            background: 'var(--gradient-primary)',
+            color: '#fff',
+            fontWeight: 600,
+            fontSize: '0.975rem',
+            textDecoration: 'none',
+            width: '100%',
+            boxShadow: '0 4px 14px rgba(249, 115, 22, 0.3)',
+            transition: 'transform 0.2s ease, opacity 0.2s ease',
+            cursor: 'pointer'
+          }}>
+            {t('startFree')}
           </Link>
-          <Link href="#demo" className="btn btn-ghost" style={{ color: 'rgba(255,255,255,0.6)' }}>
-            {t('seeDemo')} →
+          <Link href="#demo" style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: 52,
+            borderRadius: '14px',
+            background: 'rgba(255, 255, 255, 0.05)',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+            color: '#fff',
+            fontWeight: 600,
+            fontSize: '0.975rem',
+            textDecoration: 'none',
+            width: '100%',
+            transition: 'background 0.2s ease'
+          }}>
+            {t('seeDemo')}
           </Link>
         </div>
 
-        {/* Phone Mockup */}
-        <div style={{ marginTop: 48, display: 'flex', justifyContent: 'center' }}>
-          <div style={{ width: 260, height: 420, background: 'linear-gradient(180deg, #1E293B 0%, #0F172A 100%)', borderRadius: 32, border: '3px solid rgba(255,255,255,0.1)', padding: 12, boxShadow: '0 24px 80px rgba(0,0,0,0.4)', position: 'relative', overflow: 'hidden' }}>
-            <div style={{ width: '100%', height: '100%', borderRadius: 22, background: 'linear-gradient(180deg, #fff 0%, #f8fafc 100%)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-              {/* Status bar */}
-              <div style={{ height: 28, background: 'var(--gradient-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: 'white', letterSpacing: 1 }}>TEKBIZ</div>
-              {/* Mock stats */}
-              <div style={{ padding: '12px 10px', display: 'flex', gap: 6 }}>
-                {[{ v: '125K', l: 'Ventes', c: '#10B981' }, { v: '24', l: 'Commandes', c: '#F97316' }, { v: '89', l: 'Produits', c: '#3B82F6' }].map((s, i) => (
-                  <div key={i} style={{ flex: 1, background: '#f8fafc', borderRadius: 10, padding: '8px 6px', textAlign: 'center', borderTop: `2px solid ${s.c}` }}>
-                    <div style={{ fontSize: 14, fontWeight: 800, color: '#0f172a' }}>{s.v}</div>
-                    <div style={{ fontSize: 7, color: '#94a3b8', fontWeight: 600, textTransform: 'uppercase' }}>{s.l}</div>
-                  </div>
-                ))}
-              </div>
-              {/* Mock products */}
-              <div style={{ padding: '4px 10px', fontSize: 9, fontWeight: 700, color: '#0f172a', textTransform: 'uppercase', letterSpacing: 0.5 }}>Produits</div>
-              <div style={{ padding: '0 10px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, flex: 1 }}>
-                {[{ bg: '#FEF3C7' }, { bg: '#DBEAFE' }, { bg: '#D1FAE5' }, { bg: '#FCE7F3' }].map((p, i) => (
-                  <div key={i} style={{ borderRadius: 8, overflow: 'hidden', background: '#fff', border: '1px solid #e2e8f0' }}>
-                    <div style={{ height: 54, background: p.bg }} />
-                    <div style={{ padding: '4px 6px' }}>
-                      <div style={{ height: 6, background: '#e2e8f0', borderRadius: 3, marginBottom: 3, width: '80%' }} />
-                      <div style={{ height: 8, background: '#F97316', borderRadius: 3, width: '50%', opacity: 0.2 }} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-              {/* Mock bottom nav with icons */}
-              <div style={{ height: 36, borderTop: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'space-around', padding: '0 8px' }}>
-                <IconHome size={12} color="#F97316" />
-                <IconPackage size={12} color="#94a3b8" />
-                <IconClipboard size={12} color="#94a3b8" />
-                <IconDollar size={12} color="#94a3b8" />
-                <IconUser size={12} color="#94a3b8" />
-              </div>
-            </div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 40 }}>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <div style={{ width: 30, height: 30, borderRadius: '50%', border: '2px solid #030712', background: 'linear-gradient(135deg, #3B82F6, #1D4ED8)', zIndex: 3 }} />
+            <div style={{ width: 30, height: 30, borderRadius: '50%', border: '2px solid #030712', background: 'linear-gradient(135deg, #10B981, #047857)', marginLeft: -10, zIndex: 2 }} />
+            <div style={{ width: 30, height: 30, borderRadius: '50%', border: '2px solid #030712', background: 'linear-gradient(135deg, #EC4899, #BE185D)', marginLeft: -10, zIndex: 1 }} />
           </div>
+          <span style={{ fontSize: '0.8125rem', color: '#94A3B8', fontWeight: 500 }}>
+            {t('socialProof')}
+          </span>
+        </div>
+
+        {/* Phone Mockup */}
+        <div style={{ display: 'flex', justifyContent: 'center', position: 'relative', width: '100%', maxWidth: '340px', margin: '0 auto' }}>
+          {/* Glow shadow */}
+          <div style={{
+            position: 'absolute',
+            width: '240px',
+            height: '240px',
+            background: 'radial-gradient(circle, rgba(16, 185, 129, 0.22) 0%, transparent 70%)',
+            zIndex: 0,
+            top: '20%',
+            left: '50%',
+            transform: 'translate(-50%, -20%)',
+            filter: 'blur(30px)'
+          }} />
+          <img 
+            src="/hero_mockup.png" 
+            alt="Tekbiz Mobile Dashboard" 
+            style={{
+              width: '100%',
+              height: 'auto',
+              position: 'relative',
+              zIndex: 1,
+              borderRadius: '24px',
+              display: 'block'
+            }} 
+          />
         </div>
       </div>
     </section>
