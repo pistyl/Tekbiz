@@ -70,7 +70,7 @@ function DashboardShell({ children }) {
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-secondary)', paddingBottom: 'calc(var(--bottom-nav-height) + 16px)' }}>
       {/* Top Header */}
-      <header style={{ background: 'var(--surface)', borderBottom: '1px solid var(--border)', padding: '0 16px', height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 40 }}>
+      <header style={{ background: 'var(--surface)', borderBottom: '1px solid var(--border)', padding: 'env(safe-area-inset-top, 0px) 16px 0', height: 'calc(56px + env(safe-area-inset-top, 0px))', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 40 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{ width: 36, height: 36, borderRadius: 'var(--radius-md)', background: 'var(--gradient-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: '0.875rem' }}>{userInitial}</div>
           <div>
