@@ -114,7 +114,7 @@ export default function ShopPage() {
       <div 
         style={{ 
           background: store.banner ? `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(${store.banner}) center/cover no-repeat` : 'var(--gradient-primary)', 
-          padding: '48px 16px 32px', 
+          padding: 'calc(env(safe-area-inset-top, 0px) + 24px) 16px 32px', 
           textAlign: 'center', 
           color: 'white' 
         }}
