@@ -24,8 +24,7 @@ function Navbar() {
         </Link>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <LangToggle />
-          <Link href="/login" className="btn btn-ghost btn-sm">{t('login')}</Link>
-          <Link href="/register" className="btn btn-primary btn-sm">{t('register')}</Link>
+          <Link href="/login" className="btn btn-primary btn-sm">{t('commencer')}</Link>
         </div>
       </div>
     </nav>
