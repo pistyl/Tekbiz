@@ -95,96 +95,172 @@ function HeroSection() {
   const secondPart = titleParts[1] ? titleParts[1].trim() : '';
 
   return (
-    <section style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', background: '#030712', color: 'white', paddingTop: 100, paddingBottom: 60, position: 'relative', overflow: 'hidden' }}>
-      {/* Background gradients */}
-      <div style={{ position: 'absolute', top: '10%', right: '-10%', width: 350, height: 350, background: 'radial-gradient(circle, rgba(249,115,22,0.06) 0%, transparent 70%)', borderRadius: '50%', pointerEvents: 'none' }} />
-      <div style={{ position: 'absolute', bottom: '10%', left: '-10%', width: 350, height: 350, background: 'radial-gradient(circle, rgba(16,185,129,0.04) 0%, transparent 70%)', borderRadius: '50%', pointerEvents: 'none' }} />
+    <section style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', background: '#030712', color: 'white', paddingTop: 110, paddingBottom: 60, position: 'relative', overflow: 'hidden' }}>
+      <style dangerouslySetInnerHTML={{ __html: `
+        .hero-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 40px;
+          align-items: center;
+          width: 100%;
+          max-width: 1200px;
+          margin: 0 auto;
+        }
+        .hero-text-col {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+        }
+        .hero-buttons {
+          display: flex;
+          flex-direction: column;
+          gap: 14px;
+          align-items: center;
+          width: 100%;
+          max-width: 340px;
+          margin: 0 auto 24px;
+        }
+        .hero-social-proof {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          margin-bottom: 40px;
+        }
+        .hero-image-col {
+          display: flex;
+          justify-content: center;
+          position: relative;
+          width: 100%;
+          max-width: 340px;
+          margin: 0 auto;
+          z-index: 1;
+        }
+        @media (min-width: 992px) {
+          .hero-grid {
+            grid-template-columns: 1.2fr 1fr;
+            gap: 60px;
+            text-align: left;
+          }
+          .hero-text-col {
+            align-items: flex-start;
+            text-align: left;
+          }
+          .hero-buttons {
+            flex-direction: row;
+            max-width: none;
+            margin: 0 0 32px 0;
+            justify-content: flex-start;
+          }
+          .hero-buttons a {
+            width: auto;
+            min-width: 220px;
+          }
+          .hero-social-proof {
+            justify-content: flex-start;
+            margin-bottom: 0;
+          }
+          .hero-image-col {
+            max-width: 440px;
+          }
+        }
+      `}} />
       
-      <div className="container" style={{ textAlign: 'center', position: 'relative', zIndex: 1, padding: '20px 16px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <h1 style={{ fontSize: 'clamp(2.25rem, 6vw, 3.75rem)', fontWeight: 800, fontFamily: 'var(--font-display)', marginBottom: 20, lineHeight: 1.15, letterSpacing: '-0.02em', maxWidth: 700 }}>
-          {firstPart}
-          {secondPart && <><br /><span style={{ background: 'var(--gradient-primary)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{secondPart}</span></>}
-        </h1>
-        
-        <p style={{ fontSize: 'clamp(0.95rem, 2.5vw, 1.0625rem)', maxWidth: 440, margin: '0 auto 32px', color: 'rgba(255,255,255,0.7)', lineHeight: 1.6, fontWeight: 400 }}>
-          {t('heroSubtitle')}
-        </p>
-        
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 14, alignItems: 'center', width: '100%', maxWidth: '340px', margin: '0 auto 24px' }}>
-          <Link href="/register" style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            height: 52,
-            borderRadius: '14px',
-            background: 'var(--gradient-primary)',
-            color: '#fff',
-            fontWeight: 600,
-            fontSize: '0.975rem',
-            textDecoration: 'none',
-            width: '100%',
-            boxShadow: '0 4px 14px rgba(249, 115, 22, 0.3)',
-            transition: 'transform 0.2s ease, opacity 0.2s ease',
-            cursor: 'pointer'
-          }}>
-            {t('startFree')}
-          </Link>
-          <Link href="#demo" style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            height: 52,
-            borderRadius: '14px',
-            background: 'rgba(255, 255, 255, 0.05)',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
-            color: '#fff',
-            fontWeight: 600,
-            fontSize: '0.975rem',
-            textDecoration: 'none',
-            width: '100%',
-            transition: 'background 0.2s ease'
-          }}>
-            {t('seeDemo')}
-          </Link>
-        </div>
+      {/* Background gradients */}
+      <div style={{ position: 'absolute', top: '10%', right: '-10%', width: 450, height: 450, background: 'radial-gradient(circle, rgba(249,115,22,0.08) 0%, transparent 70%)', borderRadius: '50%', pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', bottom: '10%', left: '-10%', width: 450, height: 450, background: 'radial-gradient(circle, rgba(16,185,129,0.06) 0%, transparent 70%)', borderRadius: '50%', pointerEvents: 'none' }} />
+      
+      <div className="container" style={{ position: 'relative', zIndex: 1, padding: '0 16px' }}>
+        <div className="hero-grid">
+          
+          <div className="hero-text-col">
+            <h1 style={{ fontSize: 'clamp(2.25rem, 6vw, 3.75rem)', fontWeight: 800, fontFamily: 'var(--font-display)', marginBottom: 20, lineHeight: 1.15, letterSpacing: '-0.02em', maxWidth: 700 }}>
+              {firstPart}
+              {secondPart && <><br /><span style={{ background: 'var(--gradient-primary)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{secondPart}</span></>}
+            </h1>
+            
+            <p style={{ fontSize: 'clamp(0.95rem, 2.5vw, 1.0625rem)', maxWidth: 460, marginBottom: 32, color: 'rgba(255,255,255,0.7)', lineHeight: 1.6, fontWeight: 400 }}>
+              {t('heroSubtitle')}
+            </p>
+            
+            <div className="hero-buttons">
+              <Link href="/register" style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: 52,
+                borderRadius: '14px',
+                background: 'var(--gradient-primary)',
+                color: '#fff',
+                fontWeight: 600,
+                fontSize: '0.975rem',
+                textDecoration: 'none',
+                width: '100%',
+                boxShadow: '0 4px 14px rgba(249, 115, 22, 0.3)',
+                transition: 'transform 0.2s ease, opacity 0.2s ease',
+                cursor: 'pointer'
+              }}>
+                {t('startFree')}
+              </Link>
+              <Link href="#demo" style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: 52,
+                borderRadius: '14px',
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                color: '#fff',
+                fontWeight: 600,
+                fontSize: '0.975rem',
+                textDecoration: 'none',
+                width: '100%',
+                transition: 'background 0.2s ease'
+              }}>
+                {t('seeDemo')}
+              </Link>
+            </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 40 }}>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <div style={{ width: 30, height: 30, borderRadius: '50%', border: '2px solid #030712', background: 'linear-gradient(135deg, #3B82F6, #1D4ED8)', zIndex: 3 }} />
-            <div style={{ width: 30, height: 30, borderRadius: '50%', border: '2px solid #030712', background: 'linear-gradient(135deg, #10B981, #047857)', marginLeft: -10, zIndex: 2 }} />
-            <div style={{ width: 30, height: 30, borderRadius: '50%', border: '2px solid #030712', background: 'linear-gradient(135deg, #EC4899, #BE185D)', marginLeft: -10, zIndex: 1 }} />
+            <div className="hero-social-proof">
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <div style={{ width: 30, height: 30, borderRadius: '50%', border: '2px solid #030712', background: 'linear-gradient(135deg, #3B82F6, #1D4ED8)', zIndex: 3 }} />
+                <div style={{ width: 30, height: 30, borderRadius: '50%', border: '2px solid #030712', background: 'linear-gradient(135deg, #10B981, #047857)', marginLeft: -10, zIndex: 2 }} />
+                <div style={{ width: 30, height: 30, borderRadius: '50%', border: '2px solid #030712', background: 'linear-gradient(135deg, #EC4899, #BE185D)', marginLeft: -10, zIndex: 1 }} />
+              </div>
+              <span style={{ fontSize: '0.8125rem', color: '#94A3B8', fontWeight: 500 }}>
+                {t('socialProof')}
+              </span>
+            </div>
           </div>
-          <span style={{ fontSize: '0.8125rem', color: '#94A3B8', fontWeight: 500 }}>
-            {t('socialProof')}
-          </span>
-        </div>
 
-        {/* Phone Mockup */}
-        <div style={{ display: 'flex', justifyContent: 'center', position: 'relative', width: '100%', maxWidth: '340px', margin: '0 auto' }}>
-          {/* Glow shadow */}
-          <div style={{
-            position: 'absolute',
-            width: '240px',
-            height: '240px',
-            background: 'radial-gradient(circle, rgba(16, 185, 129, 0.22) 0%, transparent 70%)',
-            zIndex: 0,
-            top: '20%',
-            left: '50%',
-            transform: 'translate(-50%, -20%)',
-            filter: 'blur(30px)'
-          }} />
-          <img 
-            src="/hero_mockup.png" 
-            alt="Tekbiz Mobile Dashboard" 
-            style={{
-              width: '100%',
-              height: 'auto',
-              position: 'relative',
-              zIndex: 1,
-              borderRadius: '24px',
-              display: 'block'
-            }} 
-          />
+          <div className="hero-image-col">
+            {/* Glow shadow */}
+            <div style={{
+              position: 'absolute',
+              width: '320px',
+              height: '320px',
+              background: 'radial-gradient(circle, rgba(16, 185, 129, 0.22) 0%, transparent 70%)',
+              zIndex: 0,
+              top: '20%',
+              left: '50%',
+              transform: 'translate(-50%, -20%)',
+              filter: 'blur(35px)'
+            }} />
+            <img 
+              src="/hero_mockup.png" 
+              alt="Tekbiz Mobile Dashboard" 
+              style={{
+                width: '100%',
+                height: 'auto',
+                position: 'relative',
+                zIndex: 1,
+                borderRadius: '24px',
+                display: 'block'
+              }} 
+            />
+          </div>
+
         </div>
       </div>
     </section>
@@ -199,14 +275,14 @@ function FeaturesSection() {
     { icon: <IconChart size={28} />, title: t('feature3Title'), desc: t('feature3Desc'), color: '#3B82F6' },
   ];
   return (
-    <section style={{ padding: '80px 0', background: 'var(--bg)' }}>
+    <section style={{ padding: '80px 0', background: '#090F1C', color: 'white' }}>
       <div className="container">
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24 }}>
           {features.map((f, i) => (
-            <div key={i} className="card card-interactive" style={{ textAlign: 'center', padding: 32, borderTop: `3px solid ${f.color}` }}>
-              <div style={{ width: 64, height: 64, borderRadius: 'var(--radius-lg)', background: `${f.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: f.color, margin: '0 auto 16px' }}>{f.icon}</div>
-              <h3 style={{ marginBottom: 8 }}>{f.title}</h3>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.9375rem', lineHeight: 1.6 }}>{f.desc}</p>
+            <div key={i} className="card-interactive" style={{ textAlign: 'center', padding: 32, background: 'rgba(255, 255, 255, 0.02)', border: '1px solid rgba(255, 255, 255, 0.05)', borderTop: `3px solid ${f.color}`, borderRadius: '16px', color: '#fff', transition: 'all 0.3s ease' }}>
+              <div style={{ width: 64, height: 64, borderRadius: '16px', background: `${f.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: f.color, margin: '0 auto 16px' }}>{f.icon}</div>
+              <h3 style={{ marginBottom: 8, color: '#fff', fontWeight: 700 }}>{f.title}</h3>
+              <p style={{ color: 'rgba(255, 255, 255, 0.65)', fontSize: '0.9375rem', lineHeight: 1.6 }}>{f.desc}</p>
             </div>
           ))}
         </div>
@@ -223,19 +299,19 @@ function StepsSection() {
     { num: '03', title: t('step3'), desc: t('step3Desc'), icon: <IconParty size={24} color="white" /> },
   ];
   return (
-    <section style={{ padding: '80px 0', background: 'var(--bg-secondary)' }}>
+    <section style={{ padding: '80px 0', background: '#030712', color: 'white' }}>
       <div className="container">
-        <h2 style={{ textAlign: 'center', marginBottom: 48 }}>{t('howItWorks')}</h2>
+        <h2 style={{ textAlign: 'center', marginBottom: 48, fontWeight: 800, color: '#fff' }}>{t('howItWorks')}</h2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 32, maxWidth: 500, margin: '0 auto' }}>
           {steps.map((s, i) => (
             <div key={i} style={{ display: 'flex', gap: 20, alignItems: 'flex-start' }}>
-              <div style={{ width: 56, height: 56, borderRadius: 'var(--radius-lg)', background: 'var(--gradient-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: 'var(--shadow-float)' }}>
+              <div style={{ width: 56, height: 56, borderRadius: '16px', background: 'var(--gradient-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: 'var(--shadow-float)' }}>
                 {s.icon}
               </div>
               <div>
                 <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>Étape {s.num}</div>
-                <h4 style={{ marginBottom: 4 }}>{s.title}</h4>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>{s.desc}</p>
+                <h4 style={{ marginBottom: 4, color: '#fff', fontWeight: 700 }}>{s.title}</h4>
+                <p style={{ color: 'rgba(255, 255, 255, 0.65)', fontSize: '0.875rem', lineHeight: 1.5 }}>{s.desc}</p>
               </div>
             </div>
           ))}
@@ -248,37 +324,69 @@ function StepsSection() {
 function PricingSection() {
   const { t } = useLanguage();
   return (
-    <section style={{ padding: '80px 0', background: 'var(--bg)' }}>
+    <section style={{ padding: '80px 0', background: '#090F1C', color: 'white' }}>
       <div className="container">
-        <h2 style={{ textAlign: 'center', marginBottom: 8 }}>{t('pricingTitle')}</h2>
-        <p style={{ textAlign: 'center', color: 'var(--text-secondary)', marginBottom: 48 }}>{t('pricingSubtitle')}</p>
+        <h2 style={{ textAlign: 'center', marginBottom: 8, fontWeight: 800, color: '#fff' }}>{t('pricingTitle')}</h2>
+        <p style={{ textAlign: 'center', color: 'rgba(255, 255, 255, 0.6)', marginBottom: 48 }}>{t('pricingSubtitle')}</p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24, maxWidth: 680, margin: '0 auto' }}>
           {/* Free */}
-          <div className="card" style={{ padding: 32 }}>
-            <h4 style={{ marginBottom: 4 }}>{t('freePlan')}</h4>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '2rem', fontWeight: 900, marginBottom: 20 }}>0 <span style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--text-tertiary)' }}>FCFA</span></div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24 }}>
-              {[t('upTo20Products'), t('mobilePayments'), t('orderManagement')].map((f, i) => (
-                <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: '0.875rem' }}>
-                  <IconCheck size={16} color="var(--success)" /> {f}
-                </div>
-              ))}
+          <div style={{ padding: 32, background: 'rgba(255, 255, 255, 0.02)', border: '1px solid rgba(255, 255, 255, 0.05)', borderRadius: '16px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '380px' }}>
+            <div>
+              <h4 style={{ marginBottom: 4, color: '#fff', fontWeight: 700 }}>{t('freePlan')}</h4>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '2.25rem', fontWeight: 900, marginBottom: 20, color: '#fff' }}>0 <span style={{ fontSize: '0.875rem', fontWeight: 500, color: 'rgba(255,255,255,0.4)' }}>FCFA</span></div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24 }}>
+                {[t('upTo20Products'), t('mobilePayments'), t('orderManagement')].map((f, i) => (
+                  <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.85)' }}>
+                    <IconCheck size={16} color="var(--success)" /> {f}
+                  </div>
+                ))}
+              </div>
             </div>
-            <Link href="/register" className="btn btn-secondary btn-full">{t('startFree')}</Link>
+            <Link href="/register" style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              height: 46,
+              borderRadius: '12px',
+              background: 'rgba(255, 255, 255, 0.08)',
+              color: '#fff',
+              fontWeight: 600,
+              fontSize: '0.875rem',
+              textDecoration: 'none',
+              width: '100%',
+              transition: 'background 0.2s'
+            }}>{t('startFree')}</Link>
           </div>
+          
           {/* Pro */}
-          <div className="card" style={{ padding: 32, border: '2px solid var(--primary)', position: 'relative' }}>
-            <div style={{ position: 'absolute', top: -12, right: 20, background: 'var(--gradient-primary)', color: 'white', padding: '4px 14px', borderRadius: 'var(--radius-full)', fontSize: '0.6875rem', fontWeight: 700, textTransform: 'uppercase' }}>{t('popular')}</div>
-            <h4 style={{ marginBottom: 4 }}>{t('proPlan')}</h4>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '2rem', fontWeight: 900, marginBottom: 20 }}>5 000 <span style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--text-tertiary)' }}>FCFA{t('perMonth')}</span></div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24 }}>
-              {[t('unlimitedProducts'), t('mobilePayments'), t('orderManagement'), t('customDomain'), t('analytics'), t('prioritySupport'), t('noCommission')].map((f, i) => (
-                <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: '0.875rem' }}>
-                  <IconCheck size={16} color="var(--success)" /> {f}
-                </div>
-              ))}
+          <div style={{ padding: 32, background: 'rgba(255, 255, 255, 0.03)', border: '2px solid var(--primary)', borderRadius: '16px', position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '380px', boxShadow: '0 8px 32px rgba(249, 115, 22, 0.1)' }}>
+            <div style={{ position: 'absolute', top: -12, right: 20, background: 'var(--gradient-primary)', color: 'white', padding: '4px 14px', borderRadius: '20px', fontSize: '0.6875rem', fontWeight: 700, textTransform: 'uppercase' }}>{t('popular')}</div>
+            <div>
+              <h4 style={{ marginBottom: 4, color: '#fff', fontWeight: 700 }}>{t('proPlan')}</h4>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '2.25rem', fontWeight: 900, marginBottom: 20, color: '#fff' }}>5 000 <span style={{ fontSize: '0.875rem', fontWeight: 500, color: 'rgba(255,255,255,0.4)' }}>FCFA{t('perMonth')}</span></div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24 }}>
+                {[t('unlimitedProducts'), t('mobilePayments'), t('orderManagement'), t('customDomain'), t('analytics'), t('prioritySupport'), t('noCommission')].map((f, i) => (
+                  <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.85)' }}>
+                    <IconCheck size={16} color="var(--success)" /> {f}
+                  </div>
+                ))}
+              </div>
             </div>
-            <Link href="/register" className="btn btn-primary btn-full">{t('goPro')}</Link>
+            <Link href="/register" style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              height: 46,
+              borderRadius: '12px',
+              background: 'var(--gradient-primary)',
+              color: '#fff',
+              fontWeight: 600,
+              fontSize: '0.875rem',
+              textDecoration: 'none',
+              width: '100%',
+              transition: 'opacity 0.2s',
+              boxShadow: '0 4px 12px rgba(249, 115, 22, 0.25)'
+            }}>{t('goPro')}</Link>
           </div>
         </div>
       </div>
@@ -289,7 +397,7 @@ function PricingSection() {
 function Footer() {
   const { t } = useLanguage();
   return (
-    <footer style={{ padding: '40px 0', background: 'var(--secondary)', color: 'rgba(255,255,255,0.5)', textAlign: 'center', fontSize: '0.875rem' }}>
+    <footer style={{ padding: '40px 0', background: '#030712', color: 'rgba(255,255,255,0.4)', textAlign: 'center', fontSize: '0.875rem', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
       <div className="container">
         <div style={{ fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: '1.25rem', marginBottom: 16 }}>
           <span style={{ background: 'var(--gradient-primary)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>TEKBIZ</span>
