@@ -12,7 +12,7 @@ export default function StorePage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [form, setForm] = useState({
-    name: '', slug: '', description: '', phone: '', address: '', category: ''
+    name: '', slug: '', description: '', phone: '', address: '', category: '', logo: '', banner: ''
   });
 
   useEffect(() => {
@@ -26,38 +26,71 @@ export default function StorePage() {
         phone: s.store.phone || s.phone || '',
         address: s.store.address || '',
         category: s.store.category || '',
+        logo: s.store.logo || '',
+        banner: s.store.banner || '',
       });
     }
   }, []);
 
   const update = (k, v) => setForm(p => ({ ...p, [k]: v }));
 
-  const handleSave = (e) => {
+  const handleStoreFileUpload = async (e, type) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData
+      });
+      const result = await res.json();
+      if (result.success) {
+        update(type, result.url);
+      } else {
+        alert(result.error || 'Erreur lors de l\'upload');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Erreur réseau lors de l\'upload');
+    }
+  };
+
+  const handleSave = async (e) => {
     e.preventDefault();
     setSaving(true);
-    // Update session in localStorage
-    if (session) {
-      const updatedSession = {
-        ...session,
-        store: { ...session.store, ...form }
-      };
-      localStorage.setItem('tekbiz_session', JSON.stringify(updatedSession));
-
-      // Also update in users list
+    setSaved(false);
+    if (session?.store?.id) {
       try {
-        const users = JSON.parse(localStorage.getItem('tekbiz_users') || '[]');
-        const idx = users.findIndex(u => u.id === session.userId);
-        if (idx >= 0) {
-          users[idx].store = { ...users[idx].store, ...form };
-          localStorage.setItem('tekbiz_users', JSON.stringify(users));
+        const res = await fetch('/api/store', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            storeId: session.store.id,
+            ...form
+          })
+        });
+        const result = await res.json();
+        if (result.success) {
+          const updatedSession = {
+            ...session,
+            store: result.store
+          };
+          localStorage.setItem('tekbiz_session', JSON.stringify(updatedSession));
+          setSession(updatedSession);
+          setSaved(true);
+        } else {
+          alert(result.error || 'Erreur lors de la sauvegarde');
         }
-      } catch {}
+      } catch (err) {
+        console.error(err);
+        alert('Une erreur réseau est survenue');
+      }
     }
-    setTimeout(() => {
-      setSaving(false);
-      setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
-    }, 500);
+    setSaving(false);
+    setTimeout(() => setSaved(false), 2000);
   };
 
   const handleLogout = () => {
@@ -71,27 +104,94 @@ export default function StorePage() {
 
       <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         {/* Banner & Logo */}
-        <div style={{ width: '100%', height: 120, background: 'var(--gradient-primary)', borderRadius: 'var(--radius-lg)', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <span style={{ color: 'white', fontSize: '0.8125rem', fontWeight: 500, opacity: 0.8, display: 'flex', alignItems: 'center', gap: 6 }}>
-            <IconCamera size={16} color="white" /> Bannière
-          </span>
-          <div style={{ position: 'absolute', bottom: -24, left: 16, width: 56, height: 56, borderRadius: 'var(--radius-lg)', background: 'var(--surface)', border: '3px solid var(--surface)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: 'var(--shadow-md)', color: 'var(--primary)' }}>
-            <IconStore size={24} />
-          </div>
+        <input 
+          type="file" 
+          accept="image/*" 
+          id="banner-file-upload" 
+          onChange={(e) => handleStoreFileUpload(e, 'banner')} 
+          style={{ display: 'none' }} 
+        />
+        <input 
+          type="file" 
+          accept="image/*" 
+          id="logo-file-upload" 
+          onChange={(e) => handleStoreFileUpload(e, 'logo')} 
+          style={{ display: 'none' }} 
+        />
+
+        <div 
+          style={{ 
+            width: '100%', 
+            height: 120, 
+            background: form.banner ? `url(${form.banner}) center/cover no-repeat` : 'var(--gradient-primary)', 
+            borderRadius: 'var(--radius-lg)', 
+            position: 'relative', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            overflow: 'visible'
+          }}
+        >
+          <label 
+            htmlFor="banner-file-upload" 
+            style={{ 
+              color: 'white', 
+              fontSize: '0.8125rem', 
+              fontWeight: 500, 
+              opacity: 0.9, 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: 6,
+              background: 'rgba(0, 0, 0, 0.4)',
+              padding: '6px 12px',
+              borderRadius: 'var(--radius-full)',
+              cursor: 'pointer'
+            }}
+          >
+            <IconCamera size={16} color="white" /> Modifier la bannière
+          </label>
+
+          <label 
+            htmlFor="logo-file-upload"
+            style={{ 
+              position: 'absolute', 
+              bottom: -24, 
+              left: 16, 
+              width: 56, 
+              height: 56, 
+              borderRadius: 'var(--radius-lg)', 
+              background: 'var(--surface)', 
+              border: '3px solid var(--surface)', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              boxShadow: 'var(--shadow-md)', 
+              color: 'var(--primary)',
+              overflow: 'hidden',
+              cursor: 'pointer'
+            }}
+          >
+            {form.logo ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={form.logo} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : (
+              <IconStore size={24} />
+            )}
+          </label>
         </div>
 
         <div style={{ marginTop: 16 }} />
 
         <div className="input-group">
           <label>{t('storeName')}</label>
-          <input className="input" value={form.name} onChange={e => update('name', e.target.value)} />
+          <input className="input" value={form.name} onChange={e => update('name', e.target.value)} required />
         </div>
 
         <div className="input-group">
           <label>URL</label>
           <div style={{ display: 'flex', alignItems: 'center', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)', border: '1.5px solid var(--border)', overflow: 'hidden' }}>
             <span style={{ padding: '10px 12px', fontSize: '0.875rem', color: 'var(--text-tertiary)', borderRight: '1px solid var(--border)', whiteSpace: 'nowrap', background: 'var(--bg-tertiary)' }}>tekbiz.sn/</span>
-            <input style={{ flex: 1, border: 'none', outline: 'none', padding: '10px 12px', fontSize: '0.875rem', background: 'transparent' }} value={form.slug} onChange={e => update('slug', e.target.value)} />
+            <input style={{ flex: 1, border: 'none', outline: 'none', padding: '10px 12px', fontSize: '0.875rem', background: 'transparent' }} value={form.slug} onChange={e => update('slug', e.target.value)} required />
           </div>
         </div>
 
@@ -102,7 +202,7 @@ export default function StorePage() {
 
         <div className="input-group">
           <label>{t('phone')}</label>
-          <input className="input" value={form.phone} onChange={e => update('phone', e.target.value)} />
+          <input className="input" value={form.phone} onChange={e => update('phone', e.target.value)} required />
         </div>
 
         <div className="input-group">

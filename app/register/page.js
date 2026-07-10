@@ -38,7 +38,7 @@ function RegisterForm() {
     }
 
     setLoading(true);
-    const result = register({
+    const result = await register({
       name: form.name,
       email: form.email,
       phone: form.phone,

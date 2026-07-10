@@ -24,7 +24,7 @@ function LoginForm() {
     setError('');
     setLoading(true);
 
-    const result = login(email, password);
+    const result = await login(email, password);
 
     if (result.success) {
       router.push('/dashboard');

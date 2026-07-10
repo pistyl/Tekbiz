@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { IconStore, IconMapPin, IconTag, IconShoppingBag, IconShoppingCart, IconClipboard, IconCheckCircle, IconWave, IconCreditCard } from '@/lib/icons';
 
@@ -7,31 +7,38 @@ function formatCFA(n) { return new Intl.NumberFormat('fr-FR').format(n); }
 
 const bgColors = ['#FEF3C7', '#DBEAFE', '#D1FAE5', '#FCE7F3', '#E0E7FF', '#FEE2E2'];
 
-const mockStore = {
-  name: 'Saly Fashion',
-  slug: 'saly-fashion',
-  description: 'Mode africaine authentique & accessoires tendance à Dakar',
-  category: 'Mode & Vêtements',
-  phone: '+221 77 123 4567',
-};
-
-const mockProducts = [
-  { id: '1', name: 'Robe Wax Élégante', price: 25000, description: 'Magnifique robe en tissu wax, coupe moderne et élégante. Tailles disponibles : S, M, L, XL.', stock: 12 },
-  { id: '2', name: 'Sac en cuir tressé', price: 18000, description: 'Sac à main en cuir véritable, tressé à la main par nos artisans.', stock: 5 },
-  { id: '3', name: 'Boucles d\'oreilles dorées', price: 8500, description: 'Boucles d\'oreilles en plaqué or, motifs traditionnels.', stock: 20 },
-  { id: '4', name: 'Thiouraye Parfumé', price: 3500, description: 'Encens traditionnel sénégalais de première qualité.', stock: 30 },
-  { id: '5', name: 'Boubou Homme Premium', price: 35000, description: 'Boubou en basin riche, broderie faite main. Tailles : M à XXL.', stock: 8 },
-  { id: '6', name: 'Huile de Touloucouna', price: 5000, description: 'Huile naturelle aux multiples vertus pour peau et cheveux.', stock: 15 },
-];
-
 export default function ShopPage() {
   const params = useParams();
+  const [store, setStore] = useState(null);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [cart, setCart] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showCart, setShowCart] = useState(false);
   const [showCheckout, setShowCheckout] = useState(false);
   const [orderDone, setOrderDone] = useState(false);
+  const [orderLoading, setOrderLoading] = useState(false);
+  const [orderNumber, setOrderNumber] = useState('');
   const [checkoutForm, setCheckoutForm] = useState({ name: '', phone: '', address: '', payment: 'wave' });
+
+  useEffect(() => {
+    async function loadShop() {
+      if (params?.slug) {
+        try {
+          const res = await fetch(`/api/shop/${params.slug}`);
+          const result = await res.json();
+          if (result.success) {
+            setStore(result.store);
+            setProducts(result.products || []);
+          }
+        } catch (error) {
+          console.error('Failed to load shop:', error);
+        }
+      }
+      setLoading(false);
+    }
+    loadShop();
+  }, [params]);
 
   const addToCart = (product) => {
     setCart(prev => {
@@ -47,38 +54,115 @@ export default function ShopPage() {
   const cartTotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
   const cartCount = cart.reduce((s, i) => s + i.qty, 0);
 
-  const handleOrder = (e) => {
+  const handleOrder = async (e) => {
     e.preventDefault();
-    setOrderDone(true);
-    setShowCheckout(false);
-    setShowCart(false);
-    setCart([]);
+    if (!store?.id) return;
+    setOrderLoading(true);
+
+    try {
+      const res = await fetch('/api/payments/initiate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          storeId: store.id,
+          customerName: checkoutForm.name,
+          customerPhone: checkoutForm.phone,
+          customerAddress: checkoutForm.address,
+          paymentMethod: checkoutForm.payment,
+          items: cart.map(item => ({
+            productId: item.id,
+            price: item.price,
+            quantity: item.qty
+          }))
+        })
+      });
+      const result = await res.json();
+      if (result.success && result.redirectUrl) {
+        window.location.href = result.redirectUrl;
+      } else {
+        alert(result.error || 'Erreur lors de la commande');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Une erreur de connexion est survenue');
+    } finally {
+      setOrderLoading(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-secondary)', color: 'var(--text-secondary)' }}>
+        Chargement de la boutique...
+      </div>
+    );
+  }
+
+  if (!store) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-secondary)', flexDirection: 'column', gap: 12 }}>
+        <IconStore size={48} color="var(--text-tertiary)" />
+        <h3>Boutique introuvable</h3>
+        <p style={{ color: 'var(--text-tertiary)', fontSize: '0.875rem' }}>Cette boutique n'existe pas ou a été désactivée.</p>
+      </div>
+    );
+  }
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-secondary)' }}>
       {/* Store Header */}
-      <div style={{ background: 'var(--gradient-primary)', padding: '48px 16px 32px', textAlign: 'center', color: 'white' }}>
-        <div style={{ width: 64, height: 64, borderRadius: 'var(--radius-xl)', background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', border: '2px solid rgba(255,255,255,0.3)' }}>
-          <IconStore size={28} color="white" />
+      <div 
+        style={{ 
+          background: store.banner ? `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(${store.banner}) center/cover no-repeat` : 'var(--gradient-primary)', 
+          padding: '48px 16px 32px', 
+          textAlign: 'center', 
+          color: 'white' 
+        }}
+      >
+        <div 
+          style={{ 
+            width: 64, 
+            height: 64, 
+            borderRadius: 'var(--radius-xl)', 
+            background: 'rgba(255,255,255,0.2)', 
+            backdropFilter: 'blur(8px)', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            margin: '0 auto 12px', 
+            border: '2px solid rgba(255,255,255,0.3)',
+            overflow: 'hidden'
+          }}
+        >
+          {store.logo ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={store.logo} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          ) : (
+            <IconStore size={28} color="white" />
+          )}
         </div>
-        <h2 style={{ fontSize: '1.5rem', marginBottom: 4 }}>{mockStore.name}</h2>
-        <p style={{ fontSize: '0.8125rem', opacity: 0.8 }}>{mockStore.description}</p>
+        <h2 style={{ fontSize: '1.5rem', marginBottom: 4 }}>{store.name}</h2>
+        <p style={{ fontSize: '0.8125rem', opacity: 0.8 }}>{store.description || 'Bienvenue dans notre boutique'}</p>
         <div style={{ marginTop: 8, display: 'inline-flex', gap: 8, alignItems: 'center', background: 'rgba(255,255,255,0.15)', borderRadius: 'var(--radius-full)', padding: '4px 12px', fontSize: '0.6875rem', fontWeight: 600 }}>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3 }}><IconMapPin size={10} /> Dakar</span>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3 }}><IconMapPin size={10} /> {store.address || 'Sénégal'}</span>
           <span>·</span>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3 }}><IconTag size={10} /> {mockStore.category}</span>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3 }}><IconTag size={10} /> {store.category || 'Général'}</span>
         </div>
       </div>
 
       {/* Products */}
       <div style={{ padding: 16 }}>
-        <h4 style={{ marginBottom: 12 }}>Nos produits ({mockProducts.length})</h4>
+        <h4 style={{ marginBottom: 12 }}>Nos produits ({products.length})</h4>
         <div className="product-grid">
-          {mockProducts.map((p, i) => (
+          {products.map((p, i) => (
             <div key={p.id} className="product-card" onClick={() => setSelectedProduct(p)} style={{ cursor: 'pointer' }}>
-              <div className="product-card-img" style={{ background: bgColors[i % bgColors.length], display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>
-                <IconShoppingBag size={36} />
+              <div className="product-card-img" style={{ background: bgColors[i % bgColors.length], display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', overflow: 'hidden', position: 'relative' }}>
+                {p.images && p.images.length > 0 ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={p.images[0]} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  <IconShoppingBag size={36} />
+                )}
               </div>
               <div className="product-card-body">
                 <div className="product-card-name">{p.name}</div>
@@ -87,6 +171,12 @@ export default function ShopPage() {
             </div>
           ))}
         </div>
+
+        {products.length === 0 && (
+          <div style={{ textAlign: 'center', padding: '40px 16px', color: 'var(--text-tertiary)' }}>
+            Aucun produit disponible pour le moment.
+          </div>
+        )}
       </div>
 
       {/* Floating Cart Button */}
@@ -105,12 +195,17 @@ export default function ShopPage() {
           <div className="modal-overlay" onClick={() => setSelectedProduct(null)} />
           <div className="bottom-sheet">
             <div className="bottom-sheet-handle" />
-            <div style={{ width: '100%', height: 200, background: bgColors[mockProducts.indexOf(selectedProduct) % bgColors.length], borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16, color: '#94a3b8' }}>
-              <IconShoppingBag size={64} />
+            <div style={{ width: '100%', height: 200, background: bgColors[products.indexOf(selectedProduct) % bgColors.length], borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16, color: '#94a3b8', overflow: 'hidden', position: 'relative' }}>
+              {selectedProduct.images && selectedProduct.images.length > 0 ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={selectedProduct.images[0]} alt={selectedProduct.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                <IconShoppingBag size={64} />
+              )}
             </div>
             <h3 style={{ marginBottom: 4 }}>{selectedProduct.name}</h3>
             <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', fontWeight: 800, color: 'var(--primary)', marginBottom: 12 }}>{formatCFA(selectedProduct.price)} F</div>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', lineHeight: 1.6, marginBottom: 20 }}>{selectedProduct.description}</p>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', lineHeight: 1.6, marginBottom: 20 }}>{selectedProduct.description || 'Aucune description disponible'}</p>
             <button onClick={() => addToCart(selectedProduct)} className="btn btn-primary btn-full btn-lg" style={{ gap: 8 }}>
               <IconShoppingCart size={18} /> Ajouter au panier
             </button>
@@ -185,8 +280,8 @@ export default function ShopPage() {
                 <span>Total à payer</span>
                 <span style={{ color: 'var(--primary)', fontSize: '1.125rem' }}>{formatCFA(cartTotal)} F</span>
               </div>
-              <button type="submit" className="btn btn-primary btn-full btn-lg">
-                Payer {formatCFA(cartTotal)} F →
+              <button type="submit" className="btn btn-primary btn-full btn-lg" disabled={orderLoading}>
+                {orderLoading ? 'Traitement en cours...' : `Payer ${formatCFA(cartTotal)} F →`}
               </button>
             </form>
           </div>
@@ -207,7 +302,7 @@ export default function ShopPage() {
               Votre commande a été envoyée au vendeur. Vous serez contacté pour la livraison.
             </p>
             <div style={{ background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)', padding: 14, marginBottom: 20, fontWeight: 700, fontSize: '1.125rem', color: 'var(--primary)' }}>
-              TK-{Math.floor(1000 + Math.random() * 9000)}
+              {orderNumber}
             </div>
             <button onClick={() => setOrderDone(false)} className="btn btn-primary btn-full">
               Continuer mes achats
