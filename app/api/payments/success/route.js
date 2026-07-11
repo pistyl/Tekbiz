@@ -7,6 +7,17 @@ export async function GET(request) {
     const orderId = searchParams.get('order');
 
     if (orderId) {
+      if (orderId.startsWith('SUB_')) {
+        const storeId = orderId.substring(4);
+        await prisma.store.update({
+          where: { id: storeId },
+          data: {
+            plan: 'PRO'
+          }
+        });
+        return NextResponse.redirect(new URL(`/dashboard/store?plan=success`, request.url));
+      }
+
       // Pour le développement local, on valide immédiatement la commande lors du retour
       // car le webhook de PayTech ne peut pas atteindre une adresse en localhost.
       await prisma.order.update({

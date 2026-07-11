@@ -9,15 +9,25 @@ export async function POST(request) {
     if (type_event === 'sale_complete') {
       const { orderId } = JSON.parse(custom_field);
 
-      // Mettre à jour le statut de la commande en base de données
-      await prisma.order.update({
-        where: { id: orderId },
-        data: {
-          paymentStatus: 'COMPLETED',
-          status: 'CONFIRMED',
-          paymentRef: ref_command,
-        }
-      });
+      if (orderId && orderId.startsWith('SUB_')) {
+        const storeId = orderId.substring(4);
+        await prisma.store.update({
+          where: { id: storeId },
+          data: {
+            plan: 'PRO'
+          }
+        });
+      } else {
+        // Mettre à jour le statut de la commande en base de données
+        await prisma.order.update({
+          where: { id: orderId },
+          data: {
+            paymentStatus: 'COMPLETED',
+            status: 'CONFIRMED',
+            paymentRef: ref_command,
+          }
+        });
+      }
     }
 
     return NextResponse.json({ received: true });

@@ -1,26 +1,63 @@
 'use client';
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useLanguage } from '@/lib/i18n';
 import { getSession, logout } from '@/lib/auth';
-import { IconCamera, IconStore, IconGlobe, IconEye, IconLogOut } from '@/lib/icons';
+import { IconCamera, IconStore, IconGlobe, IconEye, IconLogOut, IconCheck, IconCheckCircle } from '@/lib/icons';
 
-export default function StorePage() {
+function StoreSettings() {
   const { t } = useLanguage();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const planStatus = searchParams?.get('plan');
+
   const [session, setSession] = useState(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [uploadingBanner, setUploadingBanner] = useState(false);
+  const [upgrading, setUpgrading] = useState(false);
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+
   const [form, setForm] = useState({
     name: '', slug: '', description: '', phone: '', address: '', category: '', logo: '', banner: ''
   });
 
   useEffect(() => {
+    if (planStatus === 'success') {
+      setShowSuccessAlert(true);
+      router.replace('/dashboard/store');
+    }
+  }, [planStatus, router]);
+
+  useEffect(() => {
     const s = getSession();
     if (s?.store) {
       setSession(s);
+      
+      // Fetch fresh shop information to make sure the plan status is correct
+      fetch(`/api/shop/${s.store.slug}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && data.store) {
+            const updated = { ...s, store: data.store };
+            localStorage.setItem('tekbiz_session', JSON.stringify(updated));
+            setSession(updated);
+            setForm(p => ({
+              ...p,
+              logo: data.store.logo || '',
+              banner: data.store.banner || '',
+              name: data.store.name || '',
+              slug: data.store.slug || '',
+              description: data.store.description || '',
+              phone: data.store.phone || s.phone || '',
+              address: data.store.address || '',
+              category: data.store.category || '',
+            }));
+          }
+        })
+        .catch(err => console.error(err));
+
       setForm({
         name: s.store.name || '',
         slug: s.store.slug || '',
@@ -63,6 +100,33 @@ export default function StorePage() {
     } finally {
       if (type === 'logo') setUploadingLogo(false);
       if (type === 'banner') setUploadingBanner(false);
+    }
+  };
+
+  const handleUpgrade = async () => {
+    if (!session?.store?.id) return;
+    setUpgrading(true);
+    try {
+      const res = await fetch('/api/payments/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          storeId: session.store.id,
+          customerName: session.name,
+          customerPhone: form.phone
+        })
+      });
+      const result = await res.json();
+      if (result.success && result.redirectUrl) {
+        window.location.href = result.redirectUrl;
+      } else {
+        alert(result.error || 'Erreur lors de l\'initiation de l\'abonnement');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Une erreur réseau est survenue');
+    } finally {
+      setUpgrading(false);
     }
   };
 
@@ -220,6 +284,85 @@ export default function StorePage() {
           <input className="input" value={form.address} onChange={e => update('address', e.target.value)} />
         </div>
 
+        {/* Plan & Facturation */}
+        <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: 20 }}>
+          <h4 style={{ margin: 0, fontSize: '0.875rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>Plan & Facturation</h4>
+          
+          {session?.store?.plan === 'PRO' ? (
+            <div style={{ background: '#D1FAE5', border: '1px solid #10B981', borderRadius: 'var(--radius-md)', padding: 14, display: 'flex', alignItems: 'center', gap: 10, color: '#065F46' }}>
+              <IconCheck size={20} />
+              <div>
+                <div style={{ fontWeight: 750, fontSize: '0.875rem' }}>Plan Actuel : PRO</div>
+                <div style={{ fontSize: '0.75rem', opacity: 0.85 }}>Toutes les fonctionnalités SaaS sont débloquées.</div>
+              </div>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', padding: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>Plan Actuel :</span>
+                <span className="badge badge-warning" style={{ fontSize: '0.75rem', fontWeight: 700 }}>GRATUIT</span>
+              </div>
+
+              {/* Upgrade Pricing Box matching user screenshot */}
+              <div style={{ 
+                border: '2px solid var(--primary)', 
+                borderRadius: 'var(--radius-lg)', 
+                padding: '24px 16px', 
+                background: 'var(--surface)', 
+                position: 'relative',
+                boxShadow: 'var(--shadow-md)'
+              }}>
+                <div style={{ 
+                  position: 'absolute', 
+                  top: -12, 
+                  right: 16, 
+                  background: 'var(--gradient-primary)', 
+                  color: 'white', 
+                  padding: '4px 14px', 
+                  borderRadius: '20px', 
+                  fontSize: '0.6875rem', 
+                  fontWeight: 700, 
+                  textTransform: 'uppercase' 
+                }}>
+                  Populaire
+                </div>
+
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: 4 }}>Pro</h3>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 16 }}>
+                  <span style={{ fontSize: '1.75rem', fontWeight: 900, fontFamily: 'var(--font-display)' }}>5 000</span>
+                  <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>FCFA/mois</span>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
+                  {[
+                    'Produits illimités',
+                    'Paiements Wave & OM',
+                    'Gestion des commandes',
+                    'Domaine personnalisé',
+                    'Statistiques avancées',
+                    'Support prioritaire',
+                    '0% de commission'
+                  ].map((feat, idx) => (
+                    <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
+                      <IconCheck size={14} color="var(--success)" /> {feat}
+                    </div>
+                  ))}
+                </div>
+
+                <button 
+                  type="button" 
+                  onClick={handleUpgrade}
+                  disabled={upgrading}
+                  className="btn btn-primary btn-full btn-lg" 
+                  style={{ fontWeight: 700 }}
+                >
+                  {upgrading ? 'Initiation du paiement...' : 'Passer au Pro'}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* Language Toggle */}
         <div className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
@@ -248,6 +391,34 @@ export default function StorePage() {
           <IconLogOut size={16} /> Déconnexion
         </button>
       </form>
+
+      {/* Subscription Activation Success Alert */}
+      {showSuccessAlert && (
+        <>
+          <div className="modal-overlay" onClick={() => setShowSuccessAlert(false)} />
+          <div className="bottom-sheet" style={{ textAlign: 'center', zIndex: 60 }}>
+            <div className="bottom-sheet-handle" />
+            <div style={{ marginBottom: 12, color: 'var(--success)', display: 'flex', justifyContent: 'center' }}>
+              <IconCheckCircle size={64} />
+            </div>
+            <h3 style={{ marginBottom: 8 }}>Abonnement Pro activé !</h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginBottom: 20 }}>
+              Félicitations ! Vous profitez désormais de toutes les fonctionnalités illimitées du plan Pro.
+            </p>
+            <button onClick={() => setShowSuccessAlert(false)} className="btn btn-primary btn-full">
+              C'est parti !
+            </button>
+          </div>
+        </>
+      )}
     </div>
+  );
+}
+
+export default function StorePage() {
+  return (
+    <Suspense fallback={<div style={{ padding: 16, color: 'var(--text-tertiary)' }}>Chargement...</div>}>
+      <StoreSettings />
+    </Suspense>
   );
 }
