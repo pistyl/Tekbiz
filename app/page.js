@@ -194,6 +194,11 @@ function HeroSection() {
           max-width: 1200px;
           margin: 0 auto;
         }
+        @media (max-width: 991px) {
+          .hero-grid {
+            padding-top: 40px;
+          }
+        }
         .hero-text-col {
           display: flex;
           flex-direction: column;
