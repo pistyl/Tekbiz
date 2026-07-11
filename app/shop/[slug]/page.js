@@ -19,7 +19,7 @@ export default function ShopPage() {
   const [orderDone, setOrderDone] = useState(false);
   const [orderLoading, setOrderLoading] = useState(false);
   const [orderNumber, setOrderNumber] = useState('');
-  const [checkoutForm, setCheckoutForm] = useState({ name: '', phone: '', address: '', payment: 'wave' });
+  const [checkoutForm, setCheckoutForm] = useState({ name: '', phone: '', address: '', payment: 'delivery' });
 
   useEffect(() => {
     async function loadShop() {
@@ -59,28 +59,58 @@ export default function ShopPage() {
     if (!store?.id) return;
     setOrderLoading(true);
 
+    const isDelivery = checkoutForm.payment === 'delivery';
+
     try {
-      const res = await fetch('/api/payments/initiate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          storeId: store.id,
-          customerName: checkoutForm.name,
-          customerPhone: checkoutForm.phone,
-          customerAddress: checkoutForm.address,
-          paymentMethod: checkoutForm.payment,
-          items: cart.map(item => ({
-            productId: item.id,
-            price: item.price,
-            quantity: item.qty
-          }))
-        })
-      });
-      const result = await res.json();
-      if (result.success && result.redirectUrl) {
-        window.location.href = result.redirectUrl;
+      if (isDelivery) {
+        const res = await fetch('/api/orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            storeId: store.id,
+            customerName: checkoutForm.name,
+            customerPhone: checkoutForm.phone,
+            customerAddress: checkoutForm.address,
+            paymentMethod: 'delivery',
+            items: cart.map(item => ({
+              productId: item.id,
+              price: item.price,
+              quantity: item.qty
+            }))
+          })
+        });
+        const result = await res.json();
+        if (result.success && result.order) {
+          setOrderNumber(result.order.orderNumber);
+          setCart([]);
+          setShowCheckout(false);
+          setOrderDone(true);
+        } else {
+          alert(result.error || 'Erreur lors de la commande');
+        }
       } else {
-        alert(result.error || 'Erreur lors de la commande');
+        const res = await fetch('/api/payments/initiate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            storeId: store.id,
+            customerName: checkoutForm.name,
+            customerPhone: checkoutForm.phone,
+            customerAddress: checkoutForm.address,
+            paymentMethod: 'mobile_money',
+            items: cart.map(item => ({
+              productId: item.id,
+              price: item.price,
+              quantity: item.qty
+            }))
+          })
+        });
+        const result = await res.json();
+        if (result.success && result.redirectUrl) {
+          window.location.href = result.redirectUrl;
+        } else {
+          alert(result.error || 'Erreur lors de la commande');
+        }
       }
     } catch (err) {
       console.error(err);
@@ -268,20 +298,51 @@ export default function ShopPage() {
               <div className="input-group">
                 <label>Payer avec</label>
                 <div style={{ display: 'flex', gap: 10 }}>
-                  {[{ key: 'wave', label: 'Wave', icon: <IconWave size={16} />, bg: '#EFF6FF' }, { key: 'orange_money', label: 'Orange Money', icon: <IconCreditCard size={16} />, bg: '#FFF7ED' }].map(m => (
-                    <button key={m.key} type="button" onClick={() => setCheckoutForm(p => ({ ...p, payment: m.key }))}
-                      style={{ flex: 1, padding: '14px 8px', borderRadius: 'var(--radius-md)', border: `2px solid ${checkoutForm.payment === m.key ? 'var(--primary)' : 'var(--border)'}`, background: checkoutForm.payment === m.key ? m.bg : 'var(--bg)', fontSize: '0.8125rem', fontWeight: 600, transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-                      {m.icon} {m.label}
-                    </button>
-                  ))}
+                  <button type="button" onClick={() => setCheckoutForm(p => ({ ...p, payment: 'delivery' }))}
+                    style={{ 
+                      flex: 1, 
+                      padding: '14px 8px', 
+                      borderRadius: 'var(--radius-md)', 
+                      border: `2px solid ${checkoutForm.payment === 'delivery' ? 'var(--primary)' : 'var(--border)'}`, 
+                      background: checkoutForm.payment === 'delivery' ? '#EFF6FF' : 'var(--bg)', 
+                      fontSize: '0.8125rem', 
+                      fontWeight: 600, 
+                      transition: 'all 0.2s', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center', 
+                      gap: 6,
+                      color: checkoutForm.payment === 'delivery' ? 'var(--primary)' : 'var(--text)'
+                    }}>
+                    <IconClipboard size={16} /> À la livraison
+                  </button>
+                  <button type="button" onClick={() => setCheckoutForm(p => ({ ...p, payment: 'mobile_money' }))}
+                    style={{ 
+                      flex: 1, 
+                      padding: '14px 8px', 
+                      borderRadius: 'var(--radius-md)', 
+                      border: `2px solid ${checkoutForm.payment === 'mobile_money' ? 'var(--primary)' : 'var(--border)'}`, 
+                      background: checkoutForm.payment === 'mobile_money' ? '#FFF7ED' : 'var(--bg)', 
+                      fontSize: '0.8125rem', 
+                      fontWeight: 600, 
+                      transition: 'all 0.2s', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center', 
+                      gap: 6,
+                      color: checkoutForm.payment === 'mobile_money' ? 'var(--primary)' : 'var(--text)'
+                    }}>
+                    <IconWave size={16} /> Mobile Money
+                  </button>
                 </div>
               </div>
               <div style={{ background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)', padding: 14, display: 'flex', justifyContent: 'space-between', fontWeight: 700 }}>
-                <span>Total à payer</span>
+                <span>{checkoutForm.payment === 'delivery' ? 'Total de la commande' : 'Total à payer'}</span>
                 <span style={{ color: 'var(--primary)', fontSize: '1.125rem' }}>{formatCFA(cartTotal)} F</span>
               </div>
               <button type="submit" className="btn btn-primary btn-full btn-lg" disabled={orderLoading}>
-                {orderLoading ? 'Traitement en cours...' : `Payer ${formatCFA(cartTotal)} F →`}
+                {orderLoading ? 'Traitement en cours...' : 
+                 checkoutForm.payment === 'delivery' ? `Valider la commande ( ${formatCFA(cartTotal)} F ) →` : `Payer ${formatCFA(cartTotal)} F →`}
               </button>
             </form>
           </div>
@@ -297,9 +358,9 @@ export default function ShopPage() {
             <div style={{ marginBottom: 12, color: 'var(--success)', display: 'flex', justifyContent: 'center' }}>
               <IconCheckCircle size={64} />
             </div>
-            <h3 style={{ marginBottom: 8 }}>Commande confirmée !</h3>
+            <h3 style={{ marginBottom: 8 }}>Commande validée !</h3>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginBottom: 16 }}>
-              Votre commande a été envoyée au vendeur. Vous serez contacté pour la livraison.
+              Votre commande a été enregistrée avec succès. Le vendeur a été notifié et vous contactera pour la livraison.
             </p>
             <div style={{ background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)', padding: 14, marginBottom: 20, fontWeight: 700, fontSize: '1.125rem', color: 'var(--primary)' }}>
               {orderNumber}

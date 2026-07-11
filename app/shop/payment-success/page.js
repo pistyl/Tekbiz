@@ -13,7 +13,7 @@ function SuccessContent() {
       <div style={{ color: 'var(--success)', display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
         <IconCheckCircle size={72} />
       </div>
-      <h2 style={{ marginBottom: 8 }}>Paiement réussi !</h2>
+      <h2 style={{ marginBottom: 8 }}>Paiement validé !</h2>
       <p style={{ color: 'var(--text-secondary)', fontSize: '0.9375rem', marginBottom: 24 }}>
         Merci pour votre achat. Votre commande a été enregistrée avec succès et le vendeur a été notifié.
       </p>

@@ -6,6 +6,14 @@ import { IconClipboard, IconWave, IconCreditCard, IconMessageCircle } from '@/li
 
 function formatCFA(n) { return new Intl.NumberFormat('fr-FR').format(n); }
 
+function formatWhatsApp(phone) {
+  let cleaned = phone.replace(/[^0-9]/g, '');
+  if (!cleaned.startsWith('221')) {
+    cleaned = '221' + cleaned;
+  }
+  return cleaned;
+}
+
 const statusColors = { 
   PENDING: 'warning', 
   CONFIRMED: 'info', 
@@ -150,7 +158,13 @@ export default function OrdersPage() {
               <div style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>{selectedOrder.customerPhone}</div>
               {selectedOrder.customerAddress && <div style={{ fontSize: '0.8125rem', color: 'var(--text-tertiary)', marginTop: 2 }}>{selectedOrder.customerAddress}</div>}
               <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginTop: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
-                {selectedOrder.paymentMethod === 'wave' ? <><IconWave size={14} /> Wave</> : <><IconCreditCard size={14} /> Orange Money</>}
+                {selectedOrder.paymentMethod === 'wave' ? (
+                  <><IconWave size={14} /> Wave</>
+                ) : selectedOrder.paymentMethod === 'orange_money' ? (
+                  <><IconCreditCard size={14} /> Orange Money</>
+                ) : (
+                  <><IconClipboard size={14} /> Paiement à la livraison</>
+                )}
               </div>
             </div>
 
@@ -169,7 +183,7 @@ export default function OrdersPage() {
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <a href={`https://wa.me/${selectedOrder.customerPhone.replace(/[^0-9]/g, '')}`} className="btn btn-secondary btn-full" style={{ gap: 6 }} target="_blank" rel="noopener noreferrer">
+              <a href={`https://wa.me/${formatWhatsApp(selectedOrder.customerPhone)}`} className="btn btn-secondary btn-full" style={{ gap: 6 }} target="_blank" rel="noopener noreferrer">
                 <IconMessageCircle size={16} /> Contacter sur WhatsApp
               </a>
 
