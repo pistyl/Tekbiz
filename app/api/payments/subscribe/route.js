@@ -25,6 +25,8 @@ export async function POST(request) {
       });
     }
 
+    console.error('Subscription PayTech API failed:', payment);
+
     // Sécurité Production : pas de déviation ou de validation automatique gratuite
     if (process.env.NODE_ENV === 'production') {
       return NextResponse.json({
