@@ -94,7 +94,7 @@ export default function NewProductPage() {
           accept="image/*" 
           id="product-photo-upload" 
           onChange={handleImageUpload} 
-          style={{ display: 'none' }} 
+          style={{ opacity: 0, position: 'absolute', zIndex: -1, width: 0, height: 0 }} 
         />
         <label 
           htmlFor="product-photo-upload" 

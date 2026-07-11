@@ -11,6 +11,8 @@ export default function StorePage() {
   const [session, setSession] = useState(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [uploadingBanner, setUploadingBanner] = useState(false);
   const [form, setForm] = useState({
     name: '', slug: '', description: '', phone: '', address: '', category: '', logo: '', banner: ''
   });
@@ -38,6 +40,9 @@ export default function StorePage() {
     const file = e.target.files[0];
     if (!file) return;
 
+    if (type === 'logo') setUploadingLogo(true);
+    if (type === 'banner') setUploadingBanner(true);
+
     const formData = new FormData();
     formData.append('file', file);
 
@@ -55,6 +60,9 @@ export default function StorePage() {
     } catch (err) {
       console.error(err);
       alert('Erreur réseau lors de l\'upload');
+    } finally {
+      if (type === 'logo') setUploadingLogo(false);
+      if (type === 'banner') setUploadingBanner(false);
     }
   };
 
@@ -109,14 +117,14 @@ export default function StorePage() {
           accept="image/*" 
           id="banner-file-upload" 
           onChange={(e) => handleStoreFileUpload(e, 'banner')} 
-          style={{ display: 'none' }} 
+          style={{ opacity: 0, position: 'absolute', zIndex: -1, width: 0, height: 0 }} 
         />
         <input 
           type="file" 
           accept="image/*" 
           id="logo-file-upload" 
           onChange={(e) => handleStoreFileUpload(e, 'logo')} 
-          style={{ display: 'none' }} 
+          style={{ opacity: 0, position: 'absolute', zIndex: -1, width: 0, height: 0 }} 
         />
 
         <div 
@@ -148,7 +156,7 @@ export default function StorePage() {
               cursor: 'pointer'
             }}
           >
-            <IconCamera size={16} color="white" /> Modifier la bannière
+            <IconCamera size={16} color="white" /> {uploadingBanner ? 'Upload en cours...' : 'Modifier la bannière'}
           </label>
 
           <label 
@@ -171,7 +179,9 @@ export default function StorePage() {
               cursor: 'pointer'
             }}
           >
-            {form.logo ? (
+            {uploadingLogo ? (
+              <span style={{ fontSize: '9px', color: 'var(--text-tertiary)' }}>...</span>
+            ) : form.logo ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={form.logo} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             ) : (
