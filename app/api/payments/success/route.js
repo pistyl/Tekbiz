@@ -7,26 +7,35 @@ export async function GET(request) {
     const orderId = searchParams.get('order');
 
     if (orderId) {
-      if (orderId.startsWith('SUB_')) {
-        const storeId = orderId.substring(4);
-        await prisma.store.update({
-          where: { id: storeId },
+      // Sécurité Production : En production, les validations de paiement se font exclusivement
+      // via les notifications Webhook IPN de PayTech pour éviter toute fraude par appel direct de l'URL.
+      if (process.env.NODE_ENV !== 'production') {
+        if (orderId.startsWith('SUB_')) {
+          const storeId = orderId.substring(4);
+          await prisma.store.update({
+            where: { id: storeId },
+            data: {
+              plan: 'PRO'
+            }
+          });
+          return NextResponse.redirect(new URL(`/dashboard/store?plan=success`, request.url));
+        }
+
+        // Pour le développement local, on valide immédiatement la commande lors du retour
+        await prisma.order.update({
+          where: { id: orderId },
           data: {
-            plan: 'PRO'
+            paymentStatus: 'COMPLETED',
+            status: 'CONFIRMED'
           }
         });
-        return NextResponse.redirect(new URL(`/dashboard/store?plan=success`, request.url));
       }
+    }
 
-      // Pour le développement local, on valide immédiatement la commande lors du retour
-      // car le webhook de PayTech ne peut pas atteindre une adresse en localhost.
-      await prisma.order.update({
-        where: { id: orderId },
-        data: {
-          paymentStatus: 'COMPLETED',
-          status: 'CONFIRMED'
-        }
-      });
+    if (orderId && orderId.startsWith('SUB_')) {
+      // En production, l'IPN Webhook a déjà validé l'abonnement.
+      // On redirige simplement vers les paramètres de la boutique.
+      return NextResponse.redirect(new URL(`/dashboard/store?plan=success`, request.url));
     }
 
     return NextResponse.redirect(new URL(`/shop/payment-success?order=${orderId}`, request.url));

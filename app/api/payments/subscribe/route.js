@@ -25,7 +25,14 @@ export async function POST(request) {
       });
     }
 
-    // Fallback Démo : Redirection locale immédiate si PayTech n'est pas configuré
+    // Sécurité Production : pas de déviation ou de validation automatique gratuite
+    if (process.env.NODE_ENV === 'production') {
+      return NextResponse.json({
+        error: 'Le service de paiement est indisponible pour le moment. Veuillez configurer vos clés API.'
+      }, { status: 503 });
+    }
+
+    // Fallback Démo (développement uniquement)
     console.warn('PayTech non configuré pour la souscription, redirection locale de démo');
     return NextResponse.json({
       success: true,
