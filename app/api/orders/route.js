@@ -5,6 +5,22 @@ export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const storeId = searchParams.get('storeId');
+    const orderId = searchParams.get('id');
+
+    if (orderId) {
+      const order = await prisma.order.findUnique({
+        where: { id: orderId },
+        include: {
+          store: true,
+          items: {
+            include: {
+              product: true
+            }
+          }
+        }
+      });
+      return NextResponse.json({ success: true, order });
+    }
 
     if (!storeId) {
       return NextResponse.json({ error: 'storeId est requis' }, { status: 400 });

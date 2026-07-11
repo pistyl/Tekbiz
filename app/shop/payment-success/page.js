@@ -1,12 +1,26 @@
 'use client';
 import { useSearchParams } from 'next/navigation';
-import { Suspense } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { IconCheckCircle, IconShoppingBag } from '@/lib/icons';
 
 function SuccessContent() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get('order');
+  const [storeSlug, setStoreSlug] = useState('');
+
+  useEffect(() => {
+    if (orderId) {
+      fetch(`/api/orders?id=${orderId}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && data.order?.store?.slug) {
+            setStoreSlug(data.order.store.slug);
+          }
+        })
+        .catch(err => console.error(err));
+    }
+  }, [orderId]);
 
   return (
     <div className="card" style={{ maxWidth: 480, width: '100%', textAlign: 'center', padding: 32 }}>
@@ -24,8 +38,8 @@ function SuccessContent() {
         </div>
       )}
       
-      <Link href="/" className="btn btn-primary btn-full btn-lg" style={{ gap: 8 }}>
-        <IconShoppingBag size={18} /> Retour à l'accueil
+      <Link href={storeSlug ? `/shop/${storeSlug}` : '/'} className="btn btn-primary btn-full btn-lg" style={{ gap: 8 }}>
+        <IconShoppingBag size={18} /> {storeSlug ? 'Continuer mes achats' : "Retour à l'accueil"}
       </Link>
     </div>
   );
