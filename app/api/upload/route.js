@@ -1,6 +1,4 @@
 import { NextResponse } from 'next/server';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
 
 export async function POST(request) {
   try {
@@ -14,19 +12,11 @@ export async function POST(request) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Créer le dossier public/uploads s'il n'existe pas
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads');
-    await mkdir(uploadDir, { recursive: true });
+    // Convert file to base64 Data URL (fully serverless-compatible)
+    const mimeType = file.type || 'image/jpeg';
+    const base64Data = buffer.toString('base64');
+    const fileUrl = `data:${mimeType};base64,${base64Data}`;
 
-    // Générer un nom de fichier unique
-    const cleanFileName = file.name.replace(/[^a-zA-Z0-9.]/g, '_');
-    const filename = `${Date.now()}-${cleanFileName}`;
-    const filePath = path.join(uploadDir, filename);
-
-    // Écrire le fichier sur le disque
-    await writeFile(filePath, buffer);
-
-    const fileUrl = `/uploads/${filename}`;
     return NextResponse.json({ success: true, url: fileUrl });
   } catch (error) {
     console.error('File upload error:', error);
