@@ -727,6 +727,8 @@ function LandingContent() {
           line-height: 1.6;
           margin-bottom: 32px;
           max-width: 500px;
+          margin-left: auto;
+          margin-right: auto;
         }
         .hero-buttons {
           display: flex;
@@ -759,6 +761,12 @@ function LandingContent() {
           box-shadow: var(--shadow-sm);
         }
 
+        .hero-text-col {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+        }
         .hero-grid {
           display: grid;
           grid-template-columns: 1fr;
@@ -1724,6 +1732,7 @@ function LandingContent() {
           .hero-buttons {
             flex-direction: row;
             max-width: none;
+            justify-content: center;
           }
           .btn-hero {
             flex: 1;
@@ -1750,10 +1759,15 @@ function LandingContent() {
             gap: 60px;
           }
           .hero-text-col {
+            align-items: flex-start;
             text-align: left;
           }
           .hero-subtitle {
+            margin-left: 0;
             margin-right: auto;
+          }
+          .hero-buttons {
+            justify-content: flex-start;
           }
         }
       `}} />
