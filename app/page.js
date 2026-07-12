@@ -38,7 +38,7 @@ function Navbar() {
 
   return (
     <nav className={`navbar-custom ${scrolled ? 'navbar-scrolled' : ''}`}>
-      <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 72, padding: '0 16px' }}>
+      <div className="container navbar-container">
         <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
           <div className="logo-box">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="url(#bag-grad-nav)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -81,10 +81,7 @@ function HeroSection() {
         <div className="hero-grid">
           
           <div className="hero-text-col">
-            <div className="promo-badge">
-              <span className="promo-pulse" />
-              Nouveau : Paiements Wave & OM automatisés !
-            </div>
+          
             
             <h1 className="hero-title">
               {firstPart}
@@ -584,12 +581,31 @@ function LandingContent() {
           backdrop-filter: blur(20px);
           -webkit-backdrop-filter: blur(20px);
           border-bottom: 1px solid var(--border);
+          padding-top: env(safe-area-inset-top, 0px);
           transition: all 0.3s ease;
         }
         .navbar-scrolled {
           background: rgba(255, 255, 255, 0.85);
           box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-          height: 64px;
+        }
+        .navbar-container {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          height: 56px;
+          padding: 0 16px;
+          transition: all 0.3s ease;
+        }
+        .navbar-scrolled .navbar-container {
+          height: 50px;
+        }
+        @media (min-width: 768px) {
+          .navbar-container {
+            height: 72px;
+          }
+          .navbar-scrolled .navbar-container {
+            height: 60px;
+          }
         }
         .logo-box {
           display: flex;
@@ -636,14 +652,14 @@ function LandingContent() {
           align-items: center;
           background: var(--bg);
           color: var(--text);
-          padding-top: 110px;
+          padding-top: calc(88px + env(safe-area-inset-top, 0px));
           padding-bottom: 60px;
           position: relative;
           overflow: hidden;
         }
         @media (min-width: 768px) {
           .hero-section {
-            padding-top: 140px;
+            padding-top: calc(120px + env(safe-area-inset-top, 0px));
             padding-bottom: 80px;
           }
         }
