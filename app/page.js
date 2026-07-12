@@ -39,21 +39,19 @@ function Navbar() {
   return (
     <nav className={`navbar-custom ${scrolled ? 'navbar-scrolled' : ''}`}>
       <div className="container navbar-container">
-        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
-          <div className="logo-box">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="url(#bag-grad-nav)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <defs>
-                <linearGradient id="bag-grad-nav" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#F97316" />
-                  <stop offset="100%" stopColor="#F59E0B" />
-                </linearGradient>
-              </defs>
-              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
-              <line x1="3" y1="6" x2="21" y2="6" />
-              <path d="M16 10a4 4 0 0 1-8 0" />
-            </svg>
-            <span style={{ fontSize: '7px', fontWeight: 950, color: 'var(--primary)', letterSpacing: '0.8px', lineHeight: 1 }}>TEKBIZ</span>
-          </div>
+        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none' }}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="url(#bag-grad-nav)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <defs>
+              <linearGradient id="bag-grad-nav" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#F97316" />
+                <stop offset="100%" stopColor="#F59E0B" />
+              </linearGradient>
+            </defs>
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <path d="M16 10a4 4 0 0 1-8 0" />
+          </svg>
+          <span style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--primary)', letterSpacing: '-0.02em' }}>TEKBIZ</span>
         </Link>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <LangToggle />
