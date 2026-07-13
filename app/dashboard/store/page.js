@@ -3,7 +3,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useLanguage } from '@/lib/i18n';
 import { getSession, logout } from '@/lib/auth';
-import { IconCamera, IconStore, IconGlobe, IconEye, IconLogOut, IconCheck, IconCheckCircle } from '@/lib/icons';
+import { IconCamera, IconStore, IconGlobe, IconEye, IconLogOut, IconCheck, IconCheckCircle, IconWave, IconCreditCard } from '@/lib/icons';
 
 function StoreSettings() {
   const { t } = useLanguage();
@@ -18,6 +18,7 @@ function StoreSettings() {
   const [uploadingBanner, setUploadingBanner] = useState(false);
   const [upgrading, setUpgrading] = useState(false);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [subMethod, setSubMethod] = useState('wave');
 
   const [form, setForm] = useState({
     name: '', slug: '', description: '', phone: '', address: '', category: '', logo: '', banner: ''
@@ -162,7 +163,8 @@ function StoreSettings() {
         body: JSON.stringify({
           storeId: session.store.id,
           customerName: session.name,
-          customerPhone: form.phone
+          customerPhone: form.phone,
+          paymentMethod: subMethod
         })
       });
       const result = await res.json();
@@ -396,6 +398,51 @@ function StoreSettings() {
                       <IconCheck size={14} color="var(--success)" /> {feat}
                     </div>
                   ))}
+                </div>
+
+                {/* Method selector for subscription */}
+                <div style={{ marginBottom: 16 }}>
+                  <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 6 }}>Payer l'abonnement via :</div>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button type="button" onClick={() => setSubMethod('wave')}
+                      style={{ 
+                        flex: 1, 
+                        padding: '10px 8px', 
+                        borderRadius: 'var(--radius-md)', 
+                        border: `1.5px solid ${subMethod === 'wave' ? '#3B82F6' : 'var(--border)'}`, 
+                        background: subMethod === 'wave' ? '#EFF6FF' : 'transparent', 
+                        fontSize: '0.75rem', 
+                        fontWeight: 600,
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center', 
+                        gap: 6,
+                        color: subMethod === 'wave' ? '#3B82F6' : 'var(--text-secondary)',
+                        transition: 'all 0.2s',
+                        cursor: 'pointer'
+                      }}>
+                      <IconWave size={14} color={subMethod === 'wave' ? '#3B82F6' : 'var(--text-secondary)'} /> Wave
+                    </button>
+                    <button type="button" onClick={() => setSubMethod('orange_money')}
+                      style={{ 
+                        flex: 1, 
+                        padding: '10px 8px', 
+                        borderRadius: 'var(--radius-md)', 
+                        border: `1.5px solid ${subMethod === 'orange_money' ? '#F97316' : 'var(--border)'}`, 
+                        background: subMethod === 'orange_money' ? '#FFF7ED' : 'transparent', 
+                        fontSize: '0.75rem', 
+                        fontWeight: 600,
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center', 
+                        gap: 6,
+                        color: subMethod === 'orange_money' ? '#F97316' : 'var(--text-secondary)',
+                        transition: 'all 0.2s',
+                        cursor: 'pointer'
+                      }}>
+                      <IconCreditCard size={14} color={subMethod === 'orange_money' ? '#F97316' : 'var(--text-secondary)'} /> Orange
+                    </button>
+                  </div>
                 </div>
 
                 <button 

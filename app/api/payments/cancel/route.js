@@ -7,6 +7,10 @@ export async function GET(request) {
     const orderId = searchParams.get('order');
 
     if (orderId) {
+      if (orderId.startsWith('SUB_')) {
+        return NextResponse.redirect(new URL(`/dashboard/store?plan=cancel`, request.url));
+      }
+
       await prisma.order.update({
         where: { id: orderId },
         data: {

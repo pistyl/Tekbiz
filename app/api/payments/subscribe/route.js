@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
-import { createPayment } from '@/lib/paytech';
+import { createPayment } from '@/lib/unitechpay';
 
 export async function POST(request) {
   try {
-    const { storeId, customerName, customerPhone } = await request.json();
+    const { storeId, customerName, customerPhone, paymentMethod } = await request.json();
 
     if (!storeId) {
       return NextResponse.json({ error: 'storeId est requis' }, { status: 400 });
@@ -16,6 +16,7 @@ export async function POST(request) {
       orderId,
       customerName: customerName || 'Propriétaire Boutique',
       customerPhone: customerPhone || '770000000',
+      paymentMethod: paymentMethod || 'wave'
     });
 
     if (payment.success === 1 && payment.redirect_url) {
@@ -25,7 +26,7 @@ export async function POST(request) {
       });
     }
 
-    console.error('Subscription PayTech API failed:', payment);
+    console.error('Subscription UnitechPay API failed:', payment);
 
     // Sécurité Production : pas de déviation ou de validation automatique gratuite
     if (process.env.NODE_ENV === 'production') {
@@ -35,7 +36,7 @@ export async function POST(request) {
     }
 
     // Fallback Démo (développement uniquement)
-    console.warn('PayTech non configuré pour la souscription, redirection locale de démo');
+    console.warn('UnitechPay non configuré pour la souscription, redirection locale de démo');
     return NextResponse.json({
       success: true,
       redirectUrl: `/api/payments/success?order=${orderId}`,

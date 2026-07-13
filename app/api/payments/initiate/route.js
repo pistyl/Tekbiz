@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { createPayment } from '@/lib/paytech';
+import { createPayment } from '@/lib/unitechpay';
 
 export async function POST(request) {
   try {
@@ -35,13 +35,14 @@ export async function POST(request) {
       }
     });
 
-    // 2. Appeler l'API de PayTech
+    // 2. Appeler l'API de UnitechPay
     const payment = await createPayment({
       amount: totalAmount,
       description: `Commande ${order.orderNumber}`,
       orderId: order.id,
       customerName,
       customerPhone,
+      paymentMethod,
     });
 
     // Si l'API PayTech a fonctionné, on renvoie l'URL de redirection
@@ -54,8 +55,8 @@ export async function POST(request) {
       });
     }
 
-    // Fallback Démo : Si les clés PayTech ne sont pas encore configurées, on simule le succès localement
-    console.warn('PayTech non configuré ou invalide, redirection de démo activée :', payment);
+    // Fallback Démo : Si les clés UnitechPay ne sont pas encore configurées, on simule le succès localement
+    console.warn('UnitechPay non configuré ou invalide, redirection de démo activée :', payment);
     return NextResponse.json({
       success: true,
       redirectUrl: `/shop/payment-success?order=${order.id}`,

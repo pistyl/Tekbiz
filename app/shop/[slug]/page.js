@@ -97,7 +97,7 @@ export default function ShopPage() {
             customerName: checkoutForm.name,
             customerPhone: checkoutForm.phone,
             customerAddress: checkoutForm.address,
-            paymentMethod: 'mobile_money',
+            paymentMethod: checkoutForm.payment,
             items: cart.map(item => ({
               productId: item.id,
               price: item.price,
@@ -297,42 +297,57 @@ export default function ShopPage() {
               </div>
               <div className="input-group">
                 <label>Payer avec</label>
-                <div style={{ display: 'flex', gap: 10 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   <button type="button" onClick={() => setCheckoutForm(p => ({ ...p, payment: 'delivery' }))}
                     style={{ 
-                      flex: 1, 
-                      padding: '14px 8px', 
+                      width: '100%', 
+                      padding: '14px 12px', 
                       borderRadius: 'var(--radius-md)', 
                       border: `2px solid ${checkoutForm.payment === 'delivery' ? 'var(--primary)' : 'var(--border)'}`, 
-                      background: checkoutForm.payment === 'delivery' ? '#EFF6FF' : 'var(--bg)', 
-                      fontSize: '0.8125rem', 
-                      fontWeight: 600, 
+                      background: checkoutForm.payment === 'delivery' ? '#EFF6FF' : 'var(--surface)', 
+                      fontSize: '0.875rem', 
+                      fontWeight: 650, 
                       transition: 'all 0.2s', 
                       display: 'flex', 
                       alignItems: 'center', 
-                      justifyContent: 'center', 
-                      gap: 6,
+                      gap: 10,
                       color: checkoutForm.payment === 'delivery' ? 'var(--primary)' : 'var(--text)'
                     }}>
-                    <IconClipboard size={16} /> À la livraison
+                    <IconClipboard size={18} /> À la livraison
                   </button>
-                  <button type="button" onClick={() => setCheckoutForm(p => ({ ...p, payment: 'mobile_money' }))}
+                  <button type="button" onClick={() => setCheckoutForm(p => ({ ...p, payment: 'wave' }))}
                     style={{ 
-                      flex: 1, 
-                      padding: '14px 8px', 
+                      width: '100%', 
+                      padding: '14px 12px', 
                       borderRadius: 'var(--radius-md)', 
-                      border: `2px solid ${checkoutForm.payment === 'mobile_money' ? 'var(--primary)' : 'var(--border)'}`, 
-                      background: checkoutForm.payment === 'mobile_money' ? '#FFF7ED' : 'var(--bg)', 
-                      fontSize: '0.8125rem', 
-                      fontWeight: 600, 
+                      border: `2px solid ${checkoutForm.payment === 'wave' ? '#3B82F6' : 'var(--border)'}`, 
+                      background: checkoutForm.payment === 'wave' ? '#EFF6FF' : 'var(--surface)', 
+                      fontSize: '0.875rem', 
+                      fontWeight: 650, 
                       transition: 'all 0.2s', 
                       display: 'flex', 
                       alignItems: 'center', 
-                      justifyContent: 'center', 
-                      gap: 6,
-                      color: checkoutForm.payment === 'mobile_money' ? 'var(--primary)' : 'var(--text)'
+                      gap: 10,
+                      color: checkoutForm.payment === 'wave' ? '#3B82F6' : 'var(--text)'
                     }}>
-                    <IconWave size={16} /> Mobile Money
+                    <IconWave size={18} color={checkoutForm.payment === 'wave' ? '#3B82F6' : 'var(--text-secondary)'} /> Wave
+                  </button>
+                  <button type="button" onClick={() => setCheckoutForm(p => ({ ...p, payment: 'orange_money' }))}
+                    style={{ 
+                      width: '100%', 
+                      padding: '14px 12px', 
+                      borderRadius: 'var(--radius-md)', 
+                      border: `2px solid ${checkoutForm.payment === 'orange_money' ? '#F97316' : 'var(--border)'}`, 
+                      background: checkoutForm.payment === 'orange_money' ? '#FFF7ED' : 'var(--surface)', 
+                      fontSize: '0.875rem', 
+                      fontWeight: 650, 
+                      transition: 'all 0.2s', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: 10,
+                      color: checkoutForm.payment === 'orange_money' ? '#F97316' : 'var(--text)'
+                    }}>
+                    <IconCreditCard size={18} color={checkoutForm.payment === 'orange_money' ? '#F97316' : 'var(--text-secondary)'} /> Orange Money
                   </button>
                 </div>
               </div>
