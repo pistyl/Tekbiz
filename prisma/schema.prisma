@@ -30,6 +30,7 @@ model Store {
   address     String?
   isActive    Boolean   @default(true)
   plan        String    @default("FREE")
+  subscriptionEnd DateTime?
   userId      String    @unique
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   products    Product[]

@@ -14,36 +14,59 @@ export default function ProductsPage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [storeDetail, setStoreDetail] = useState(null);
 
   useEffect(() => {
-    async function loadProducts() {
+    async function loadData() {
       const session = getSession();
       if (session?.store?.id) {
         try {
-          const res = await fetch(`/api/products?storeId=${session.store.id}`);
-          const result = await res.json();
-          if (result.success) {
-            setProducts(result.products || []);
+          const [prodRes, storeRes] = await Promise.all([
+            fetch(`/api/products?storeId=${session.store.id}`).then(res => res.json()),
+            fetch(`/api/store?storeId=${session.store.id}`).then(res => res.json())
+          ]);
+          if (prodRes.success) {
+            setProducts(prodRes.products || []);
+          }
+          if (storeRes.success) {
+            setStoreDetail(storeRes.store);
           }
         } catch (error) {
-          console.error('Failed to load products:', error);
+          console.error('Failed to load products page data:', error);
         }
       }
       setLoading(false);
     }
-    loadProducts();
+    loadData();
   }, []);
 
   const filtered = products.filter(p =>
     p.name.toLowerCase().includes(search.toLowerCase())
   );
 
+  const isExpired = storeDetail?.plan === 'PRO' && 
+                    storeDetail?.subscriptionEnd && 
+                    new Date() > new Date(storeDetail.subscriptionEnd);
+  
+  const isFreeLimit = storeDetail?.plan === 'FREE' && products.length >= 5;
+
   return (
     <div style={{ padding: 16 }}>
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <h3>{t('myProducts')} <span style={{ color: 'var(--text-tertiary)', fontWeight: 400, fontSize: '0.875rem' }}>({products.length})</span></h3>
-        <Link href="/dashboard/products/new" className="btn btn-primary btn-sm">+ {t('newProduct')}</Link>
+        {isExpired || isFreeLimit ? (
+          <button 
+            className="btn btn-primary btn-sm" 
+            style={{ opacity: 0.5, cursor: 'not-allowed' }}
+            disabled
+            title={isExpired ? "Abonnement expiré" : "Limite de 5 produits atteinte"}
+          >
+            + {t('newProduct')}
+          </button>
+        ) : (
+          <Link href="/dashboard/products/new" className="btn btn-primary btn-sm">+ {t('newProduct')}</Link>
+        )}
       </div>
 
       {/* Search */}
@@ -84,7 +107,17 @@ export default function ProductsPage() {
           <div className="empty-state-icon"><IconPackage size={36} /></div>
           <h4>{t('noProducts')}</h4>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>{t('noProductsDesc')}</p>
-          <Link href="/dashboard/products/new" className="btn btn-primary">{t('addProduct')}</Link>
+          {isExpired || isFreeLimit ? (
+            <button 
+              className="btn btn-primary" 
+              style={{ opacity: 0.5, cursor: 'not-allowed' }}
+              disabled
+            >
+              {t('addProduct')}
+            </button>
+          ) : (
+            <Link href="/dashboard/products/new" className="btn btn-primary">{t('addProduct')}</Link>
+          )}
         </div>
       )}
     </div>

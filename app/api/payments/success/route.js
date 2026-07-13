@@ -15,7 +15,8 @@ export async function GET(request) {
           await prisma.store.update({
             where: { id: storeId },
             data: {
-              plan: 'PRO'
+              plan: 'PRO',
+              subscriptionEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
             }
           });
           return NextResponse.redirect(new URL(`/dashboard/store?plan=success`, request.url));

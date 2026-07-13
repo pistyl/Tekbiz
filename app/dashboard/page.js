@@ -22,6 +22,7 @@ export default function DashboardHome() {
   const [productsCount, setProductsCount] = useState(0);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [storeDetail, setStoreDetail] = useState(null);
   const dateInputRef = useRef(null);
   const monthInputRef = useRef(null);
 
@@ -41,11 +42,13 @@ export default function DashboardHome() {
     if (s?.store?.id) {
       Promise.all([
         fetch(`/api/products?storeId=${s.store.id}`).then(res => res.json()),
-        fetch(`/api/orders?storeId=${s.store.id}`).then(res => res.json())
+        fetch(`/api/orders?storeId=${s.store.id}`).then(res => res.json()),
+        fetch(`/api/store?storeId=${s.store.id}`).then(res => res.json())
       ])
-      .then(([prodRes, ordRes]) => {
+      .then(([prodRes, ordRes, storeRes]) => {
         if (prodRes.success) setProductsCount(prodRes.products.length);
         if (ordRes.success) setOrders(ordRes.orders || []);
+        if (storeRes.success) setStoreDetail(storeRes.store);
       })
       .catch(err => console.error('Failed to load dashboard stats:', err))
       .finally(() => setLoading(false));
@@ -135,6 +138,12 @@ export default function DashboardHome() {
     { label: "Annulées", value: String(periodCancelledCount), icon: <IconTag size={20} />, color: '#EF4444' },
   ];
 
+  const isExpired = storeDetail?.plan === 'PRO' && 
+                    storeDetail?.subscriptionEnd && 
+                    new Date() > new Date(storeDetail.subscriptionEnd);
+  
+  const isFreeLimit = storeDetail?.plan === 'FREE' && productsCount >= 5;
+
   const recentOrders = orders.slice(0, 3);
 
   return (
@@ -149,6 +158,55 @@ export default function DashboardHome() {
           <p style={{ color: 'var(--text-tertiary)', fontSize: '0.8125rem' }}>Voici le tableau de bord de votre boutique</p>
         </div>
       </div>
+
+      {/* Alerte Expiration / Limite Plan */}
+      {isExpired && (
+        <div style={{ 
+          background: '#FEE2E2', 
+          border: '1px solid #FCA5A5', 
+          borderRadius: 'var(--radius-lg)', 
+          padding: '12px 16px', 
+          marginBottom: 20, 
+          display: 'flex', 
+          flexDirection: 'column', 
+          gap: 8 
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#991B1B', fontWeight: 650, fontSize: '0.875rem' }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            Abonnement Pro expiré
+          </div>
+          <p style={{ color: '#7F1D1D', fontSize: '0.8125rem', margin: 0 }}>
+            Votre abonnement a pris fin le {new Date(storeDetail.subscriptionEnd).toLocaleDateString('fr-FR')}. Vous ne pouvez plus ajouter de produits ou les modifier sans renouvellement.
+          </p>
+          <Link href="/dashboard/store" className="btn" style={{ background: '#DC2626', color: 'white', alignSelf: 'flex-start', padding: '6px 12px', fontSize: '0.75rem', fontWeight: 700 }}>
+            Renouveler l'abonnement
+          </Link>
+        </div>
+      )}
+
+      {isFreeLimit && (
+        <div style={{ 
+          background: '#EFF6FF', 
+          border: '1px solid #BFDBFE', 
+          borderRadius: 'var(--radius-lg)', 
+          padding: '12px 16px', 
+          marginBottom: 20, 
+          display: 'flex', 
+          flexDirection: 'column', 
+          gap: 8 
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#1E40AF', fontWeight: 650, fontSize: '0.875rem' }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            Limite de produits atteinte (Plan Gratuit)
+          </div>
+          <p style={{ color: '#1E3A8A', fontSize: '0.8125rem', margin: 0 }}>
+            Vous avez atteint la limite maximale de 5 produits autorisés pour le plan gratuit. Passez au plan Pro pour ajouter plus de produits.
+          </p>
+          <Link href="/dashboard/store" className="btn" style={{ background: '#3B82F6', color: 'white', alignSelf: 'flex-start', padding: '6px 12px', fontSize: '0.75rem', fontWeight: 700 }}>
+            Passer au plan Pro
+          </Link>
+        </div>
+      )}
 
       {/* Filtre de date personnalisé (Permanent, sans layout shift ni dropdown instable) */}
       <div 
@@ -313,9 +371,20 @@ export default function DashboardHome() {
       <div style={{ marginBottom: 24 }}>
         <h4 style={{ marginBottom: 12, fontSize: '0.875rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t('quickActions')}</h4>
         <div style={{ display: 'flex', gap: 10 }}>
-          <Link href="/dashboard/products/new" className="btn btn-primary" style={{ flex: 1, fontSize: '0.8125rem' }}>
-            + {t('addProduct')}
-          </Link>
+          {isExpired || isFreeLimit ? (
+            <button 
+              className="btn btn-primary" 
+              style={{ flex: 1, fontSize: '0.8125rem', opacity: 0.5, cursor: 'not-allowed' }}
+              disabled
+              title={isExpired ? "Abonnement expiré" : "Limite de 5 produits atteinte"}
+            >
+              + {t('addProduct')}
+            </button>
+          ) : (
+            <Link href="/dashboard/products/new" className="btn btn-primary" style={{ flex: 1, fontSize: '0.8125rem' }}>
+              + {t('addProduct')}
+            </Link>
+          )}
           <button className="btn btn-secondary" style={{ flex: 1, fontSize: '0.8125rem', gap: 6 }} onClick={() => { const slug = session?.store?.slug || 'ma-boutique'; const name = session?.store?.name || 'Ma Boutique'; const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}/shop/${slug}` : `https://tekbiz.vercel.app/shop/${slug}`; if (navigator.share) { navigator.share({ title: name, url: shareUrl }); } else { navigator.clipboard.writeText(shareUrl); alert('Lien copié !'); } }}>
             <IconLink size={14} /> {t('shareStore')}
           </button>

@@ -1,6 +1,7 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useLanguage } from '@/lib/i18n';
 import { getSession } from '@/lib/auth';
 
@@ -13,6 +14,33 @@ export default function NewProductPage() {
   const [uploading, setUploading] = useState(false);
   const [imageUrl, setImageUrl] = useState('');
   const [form, setForm] = useState({ name: '', price: '', description: '', category: '', stock: '1' });
+  const [storeDetail, setStoreDetail] = useState(null);
+  const [productsCount, setProductsCount] = useState(0);
+
+  useEffect(() => {
+    async function checkLimits() {
+      const session = getSession();
+      if (session?.store?.id) {
+        try {
+          const [storeRes, prodRes] = await Promise.all([
+            fetch(`/api/store?storeId=${session.store.id}`).then(res => res.json()),
+            fetch(`/api/products?storeId=${session.store.id}`).then(res => res.json())
+          ]);
+          if (storeRes.success) setStoreDetail(storeRes.store);
+          if (prodRes.success) setProductsCount(prodRes.products.length);
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }
+    checkLimits();
+  }, []);
+
+  const isExpired = storeDetail?.plan === 'PRO' && 
+                    storeDetail?.subscriptionEnd && 
+                    new Date() > new Date(storeDetail.subscriptionEnd);
+  
+  const isFreeLimit = storeDetail?.plan === 'FREE' && productsCount >= 5;
 
   const update = (k, v) => setForm(p => ({ ...p, [k]: v }));
 
@@ -131,7 +159,32 @@ export default function NewProductPage() {
         <h3>{t('newProduct')}</h3>
       </div>
 
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      {(isExpired || isFreeLimit) && (
+        <div style={{ 
+          background: isExpired ? '#FEE2E2' : '#EFF6FF', 
+          border: `1.5px solid ${isExpired ? '#FCA5A5' : '#BFDBFE'}`, 
+          borderRadius: 'var(--radius-lg)', 
+          padding: '16px', 
+          marginBottom: 20, 
+          display: 'flex', 
+          flexDirection: 'column', 
+          gap: 10 
+        }}>
+          <h4 style={{ color: isExpired ? '#991B1B' : '#1E40AF', margin: 0, fontWeight: 700 }}>
+            {isExpired ? 'Action requise : Abonnement expiré' : 'Plan Gratuit : Limite atteinte'}
+          </h4>
+          <p style={{ color: isExpired ? '#7F1D1D' : '#1E3A8A', fontSize: '0.8125rem', margin: 0 }}>
+            {isExpired 
+              ? 'Votre abonnement Pro a expiré. Vous devez le renouveler pour pouvoir ajouter de nouveaux produits.' 
+              : 'Vous avez atteint la limite de 5 produits autorisés pour le plan gratuit. Veuillez passer au plan Pro pour ajouter plus de produits.'}
+          </p>
+          <Link href="/dashboard/store" className="btn" style={{ background: isExpired ? '#DC2626' : '#3B82F6', color: 'white', alignSelf: 'flex-start', padding: '8px 16px', fontSize: '0.8125rem', fontWeight: 700 }}>
+            {isExpired ? 'Renouveler mon abonnement' : 'Passer au plan Pro'}
+          </Link>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16, opacity: (isExpired || isFreeLimit) ? 0.5 : 1, pointerEvents: (isExpired || isFreeLimit) ? 'none' : 'auto' }}>
         {/* Photo Upload */}
         <input 
           type="file" 

@@ -30,6 +30,36 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Informations incomplètes' }, { status: 400 });
     }
 
+    // 1. Récupérer la boutique pour vérifier le plan et l'expiration
+    const store = await prisma.store.findUnique({
+      where: { id: storeId }
+    });
+
+    if (!store) {
+      return NextResponse.json({ error: 'Boutique introuvable' }, { status: 404 });
+    }
+
+    // 2. Limite du plan gratuit (max 5 produits)
+    if (store.plan === 'FREE') {
+      const count = await prisma.product.count({
+        where: { storeId }
+      });
+      if (count >= 5) {
+        return NextResponse.json({ 
+          error: 'Limite de 5 produits atteinte pour le plan gratuit. Veuillez passer au plan Pro.' 
+        }, { status: 403 });
+      }
+    }
+
+    // 3. Expiration du plan PRO (30 jours)
+    if (store.plan === 'PRO') {
+      if (store.subscriptionEnd && new Date() > new Date(store.subscriptionEnd)) {
+        return NextResponse.json({ 
+          error: 'Votre abonnement Pro a expiré. Veuillez le renouveler pour continuer à ajouter ou modifier des produits.' 
+        }, { status: 403 });
+      }
+    }
+
     const product = await prisma.product.create({
       data: {
         name,

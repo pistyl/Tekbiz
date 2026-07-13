@@ -1,6 +1,30 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
+export async function GET(request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const storeId = searchParams.get('storeId');
+
+    if (!storeId) {
+      return NextResponse.json({ error: 'storeId est requis' }, { status: 400 });
+    }
+
+    const store = await prisma.store.findUnique({
+      where: { id: storeId }
+    });
+
+    if (!store) {
+      return NextResponse.json({ error: 'Boutique introuvable' }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true, store });
+  } catch (error) {
+    console.error('Fetch store error:', error);
+    return NextResponse.json({ error: 'Erreur lors de la récupération de la boutique' }, { status: 500 });
+  }
+}
+
 export async function PUT(request) {
   try {
     const { storeId, name, slug, description, phone, address, category, logo, banner } = await request.json();
