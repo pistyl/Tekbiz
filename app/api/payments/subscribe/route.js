@@ -31,7 +31,7 @@ export async function POST(request) {
     // Sécurité Production : pas de déviation ou de validation automatique gratuite
     if (process.env.NODE_ENV === 'production') {
       return NextResponse.json({
-        error: 'Le service de paiement est indisponible pour le moment. Veuillez configurer vos clés API.'
+        error: payment.error || 'Le service de paiement est indisponible pour le moment. Veuillez configurer vos clés API.'
       }, { status: 503 });
     }
 
