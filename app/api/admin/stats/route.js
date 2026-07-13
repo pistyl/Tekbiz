@@ -11,12 +11,15 @@ export async function GET(request) {
     }
 
     // 1. Charger les statistiques globales
-    const usersCount = await prisma.user.count();
+    const users = await prisma.user.findMany({
+      select: { createdAt: true }
+    });
     const productsCount = await prisma.product.count();
     
     // Commandes complétées uniquement pour le chiffre d'affaires boutiques
     const completedOrders = await prisma.order.findMany({
-      where: { paymentStatus: 'COMPLETED' }
+      where: { paymentStatus: 'COMPLETED' },
+      select: { createdAt: true, totalAmount: true }
     });
     const totalOrdersRevenue = completedOrders.reduce((sum, o) => sum + o.totalAmount, 0);
 
@@ -41,7 +44,7 @@ export async function GET(request) {
     return NextResponse.json({
       success: true,
       stats: {
-        usersCount,
+        usersCount: users.length,
         storesCount: stores.length,
         proStoresCount,
         freeStoresCount,
@@ -49,6 +52,10 @@ export async function GET(request) {
         ordersCount: completedOrders.length,
         totalOrdersRevenue,
         subscriptionMRR
+      },
+      rawStats: {
+        users: users.map(u => ({ createdAt: u.createdAt })),
+        orders: completedOrders.map(o => ({ createdAt: o.createdAt, totalAmount: o.totalAmount }))
       },
       stores: stores.map(s => ({
         id: s.id,
