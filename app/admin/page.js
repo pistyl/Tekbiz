@@ -126,14 +126,7 @@ export default function AdminDashboard() {
     ? rawStats.users.filter(u => isDateInPeriod(u.createdAt)).length 
     : 0;
 
-  // 3. Ventes (Commandes) boutiques
-  const periodOrders = rawStats?.orders 
-    ? rawStats.orders.filter(o => isDateInPeriod(o.createdAt))
-    : [];
-  const periodOrdersCount = periodOrders.length;
-  const periodOrdersRevenue = periodOrders.reduce((sum, o) => sum + o.totalAmount, 0);
-
-  // 4. Revenus abonnements perçus sur la période
+  // 3. Chiffre d'affaires abonnements perçus sur la période (5 000 FCFA par Pro)
   const periodSubscriptionRevenue = periodProStoresCount * 5000;
 
   // --- FILTRAGE DE LA TABLE DES BOUTIQUES ---
@@ -168,7 +161,7 @@ export default function AdminDashboard() {
     return "Statistiques de la période";
   };
 
-  // --- CALCUL DES STATS DES 7 DERNIERS JOURS POUR LE DIAGRAMME ---
+  // --- CALCUL DES STATS DES 7 DERNIERS JOURS POUR LE DIAGRAMME (REVENUS ABONNEMENTS) ---
   const getChartData = () => {
     const list = [];
     for (let i = 6; i >= 0; i--) {
@@ -177,26 +170,24 @@ export default function AdminDashboard() {
       const dateStr = d.toISOString().split('T')[0];
       const label = d.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric' });
       
-      const dayStores = stores.filter(s => {
+      const dayProStores = stores.filter(s => {
         const sd = new Date(s.createdAt).toISOString().split('T')[0];
-        return sd === dateStr;
+        return sd === dateStr && s.plan === 'PRO';
       }).length;
 
-      const dayOrders = rawStats?.orders 
-        ? rawStats.orders.filter(o => {
-            const od = new Date(o.createdAt).toISOString().split('T')[0];
-            return od === dateStr;
-          })
-        : [];
-      const dayRevenue = dayOrders.reduce((sum, o) => sum + o.totalAmount, 0);
+      const daySubscriptionRevenue = dayProStores * 5000;
 
-      list.push({ label, storesCount: dayStores, revenue: dayRevenue });
+      list.push({ label, revenue: daySubscriptionRevenue });
     }
     return list;
   };
 
   const chartData = getChartData();
-  const maxRevenue = Math.max(...chartData.map(d => d.revenue), 1000);
+  const maxRevenue = Math.max(...chartData.map(d => d.revenue), 5000);
+
+  // Cumul total historique des abonnements
+  const totalProStores = stores.filter(s => s.plan === 'PRO').length;
+  const cumulativeSubscriptionRevenue = totalProStores * 5000;
 
   if (!isUnlocked) {
     return (
@@ -386,18 +377,18 @@ export default function AdminDashboard() {
           {getPeriodLabel()}
         </div>
 
-        {/* Statistics Cards */}
+        {/* Statistics Cards (SaaS Oriented only) */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, marginBottom: 24 }}>
-          {/* Abonnement / MRR Card */}
+          {/* Revenue Card (based entirely on Subscriptions) */}
           <div style={{ background: '#1e293b', border: '1px solid #334155', padding: 20, borderRadius: 12 }}>
-            <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600 }}>REVENUS ABONNEMENTS</span>
+            <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600 }}>CHIFFRE D'AFFAIRES (ABONNEMENTS)</span>
             <div style={{ fontSize: '2rem', fontWeight: 800, marginTop: 6, color: '#10b981' }}>
               {formatCFA(periodSubscriptionRevenue)} F
             </div>
             <span style={{ fontSize: '0.6875rem', color: '#64748b' }}>
               {filterPeriod === 'all' 
-                ? 'MRR Actuel (5 000 F / boutique PRO)' 
-                : 'Souscriptions initiées sur la période'}
+                ? 'Revenu cumulé des PRO actifs' 
+                : `Revenu généré par les PRO créés sur la période`}
             </span>
           </div>
 
@@ -418,33 +409,23 @@ export default function AdminDashboard() {
             </div>
             <span style={{ fontSize: '0.6875rem', color: '#64748b' }}>Marchands inscrits sur la période</span>
           </div>
-
-          <div style={{ background: '#1e293b', border: '1px solid #334155', padding: 20, borderRadius: 12 }}>
-            <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600 }}>VENTES BOUTIQUES (PÉRIODE)</span>
-            <div style={{ fontSize: '2rem', fontWeight: 800, marginTop: 6, color: '#eab308' }}>
-              {formatCFA(periodOrdersRevenue)} F
-            </div>
-            <span style={{ fontSize: '0.6875rem', color: '#64748b' }}>
-              {periodOrdersCount} commande(s) confirmée(s)
-            </span>
-          </div>
         </div>
 
-        {/* Global Lifetime SaaS Metrics */}
+        {/* Global Lifetime SaaS Metrics (SaaS Oriented only) */}
         <div style={{ background: '#111827', border: '1px solid #1f2937', padding: '14px 20px', borderRadius: 12, display: 'flex', flexWrap: 'wrap', gap: 24, marginBottom: 24, fontSize: '0.8125rem', color: '#94a3b8' }}>
           <div>Cumul Total SaaS :</div>
           <div>Boutiques Total : <strong style={{ color: 'white' }}>{stores.length}</strong></div>
           <div>Marchands Total : <strong style={{ color: 'white' }}>{stats?.usersCount || 0}</strong></div>
           <div>Produits Total : <strong style={{ color: 'white' }}>{stats?.productsCount || 0}</strong></div>
-          <div>Chiffre d'Affaires Global : <strong style={{ color: '#10b981' }}>{stats ? `${formatCFA(stats.totalOrdersRevenue)} F` : '0 F'}</strong></div>
+          <div>Chiffre d'Affaires Global (Abonnements) : <strong style={{ color: '#10b981' }}>{formatCFA(cumulativeSubscriptionRevenue)} F</strong></div>
           <div>Revenus Récurrents Mensuels (MRR) : <strong style={{ color: '#10b981' }}>{stats ? `${formatCFA(stats.subscriptionMRR)} F` : '0 F'}</strong></div>
         </div>
 
-        {/* DIAGRAMMES ANALYTIQUES (PURE CSS / HTML - ZERO DEPENDENCY) */}
+        {/* DIAGRAMMES ANALYTIQUES (PURE CSS / HTML) */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 16, marginBottom: 32 }}>
-          {/* Chart 1: Ventes des 7 derniers jours */}
+          {/* Chart 1: Revenus abonnements des 7 derniers jours */}
           <div style={{ background: '#1e293b', border: '1px solid #334155', padding: 20, borderRadius: 16 }}>
-            <h4 style={{ margin: '0 0 16px', fontSize: '1rem', fontWeight: 700, color: '#f1f5f9' }}>Chiffre d'affaires (7 derniers jours)</h4>
+            <h4 style={{ margin: '0 0 16px', fontSize: '1rem', fontWeight: 700, color: '#f1f5f9' }}>Revenus abonnements (7 derniers jours)</h4>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', height: 180, paddingTop: 10, borderBottom: '1px solid #334155', gap: 8 }}>
               {chartData.map((d, i) => {
                 const heightPercent = (d.revenue / maxRevenue) * 100;
