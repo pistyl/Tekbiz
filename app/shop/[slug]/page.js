@@ -1,7 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { IconStore, IconMapPin, IconTag, IconShoppingBag, IconShoppingCart, IconClipboard, IconCheckCircle, IconWaveLogo, IconOrangeMoneyLogo } from '@/lib/icons';
+import { IconStore, IconMapPin, IconTag, IconShoppingBag, IconShoppingCart, IconClipboard, IconCheckCircle, IconWaveLogo, IconOrangeMoneyLogo, IconArrowLeft } from '@/lib/icons';
+import { getSession } from '@/lib/auth';
 
 function formatCFA(n) { return new Intl.NumberFormat('fr-FR').format(n); }
 
@@ -20,6 +21,7 @@ export default function ShopPage() {
   const [orderLoading, setOrderLoading] = useState(false);
   const [orderNumber, setOrderNumber] = useState('');
   const [checkoutForm, setCheckoutForm] = useState({ name: '', phone: '', address: '', payment: 'delivery' });
+  const [isOwner, setIsOwner] = useState(false);
 
   useEffect(() => {
     async function loadShop() {
@@ -33,6 +35,12 @@ export default function ShopPage() {
           }
         } catch (error) {
           console.error('Failed to load shop:', error);
+        }
+
+        // Vérifier si l'utilisateur est le propriétaire de la boutique
+        const session = getSession();
+        if (session?.store?.slug === params.slug) {
+          setIsOwner(true);
         }
       }
       setLoading(false);
@@ -146,9 +154,34 @@ export default function ShopPage() {
           background: store.banner ? `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(${store.banner}) center/cover no-repeat` : 'var(--gradient-primary)', 
           padding: 'calc(env(safe-area-inset-top, 0px) + 24px) 16px 32px', 
           textAlign: 'center', 
-          color: 'white' 
+          color: 'white',
+          position: 'relative'
         }}
       >
+        {/* Bouton de retour */}
+        <a 
+          href={isOwner ? '/dashboard/store' : '/'}
+          style={{
+            position: 'absolute',
+            top: 'calc(env(safe-area-inset-top, 0px) + 16px)',
+            left: 16,
+            width: 36,
+            height: 36,
+            borderRadius: '50%',
+            background: 'rgba(0,0,0,0.4)',
+            backdropFilter: 'blur(8px)',
+            border: '1px solid rgba(255,255,255,0.2)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'white',
+            transition: 'all 0.2s',
+            zIndex: 10
+          }}
+          title={isOwner ? 'Retour au tableau de bord' : 'Retour à l\'accueil'}
+        >
+          <IconArrowLeft size={18} />
+        </a>
         <div 
           style={{ 
             width: 64, 
