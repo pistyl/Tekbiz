@@ -35,6 +35,10 @@ export async function POST(request) {
       }
     });
 
+    const host = request.headers.get('host');
+    const protocol = host.includes('localhost') ? 'http' : 'https';
+    const appUrl = `${protocol}://${host}`;
+
     // 2. Appeler l'API de UnitechPay
     const payment = await createPayment({
       amount: totalAmount,
@@ -43,6 +47,7 @@ export async function POST(request) {
       customerName,
       customerPhone,
       paymentMethod,
+      appUrl
     });
 
     // Si l'API PayTech a fonctionné, on renvoie l'URL de redirection

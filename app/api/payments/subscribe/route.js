@@ -9,6 +9,10 @@ export async function POST(request) {
       return NextResponse.json({ error: 'storeId est requis' }, { status: 400 });
     }
 
+    const host = request.headers.get('host');
+    const protocol = host.includes('localhost') ? 'http' : 'https';
+    const appUrl = `${protocol}://${host}`;
+
     const orderId = `SUB_${storeId}`;
     const payment = await createPayment({
       amount: 5000,
@@ -16,7 +20,8 @@ export async function POST(request) {
       orderId,
       customerName: customerName || 'Propriétaire Boutique',
       customerPhone: customerPhone || '770000000',
-      paymentMethod: paymentMethod || 'wave'
+      paymentMethod: paymentMethod || 'wave',
+      appUrl
     });
 
     if (payment.success === 1 && payment.redirect_url) {
