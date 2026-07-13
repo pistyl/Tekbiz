@@ -316,7 +316,7 @@ export default function DashboardHome() {
           <Link href="/dashboard/products/new" className="btn btn-primary" style={{ flex: 1, fontSize: '0.8125rem' }}>
             + {t('addProduct')}
           </Link>
-          <button className="btn btn-secondary" style={{ flex: 1, fontSize: '0.8125rem', gap: 6 }} onClick={() => { const slug = session?.store?.slug || 'ma-boutique'; const name = session?.store?.name || 'Ma Boutique'; if (navigator.share) { navigator.share({ title: name, url: `http://localhost:3000/shop/${slug}` }); } else { navigator.clipboard.writeText(`http://localhost:3000/shop/${slug}`); alert('Lien copié !'); } }}>
+          <button className="btn btn-secondary" style={{ flex: 1, fontSize: '0.8125rem', gap: 6 }} onClick={() => { const slug = session?.store?.slug || 'ma-boutique'; const name = session?.store?.name || 'Ma Boutique'; const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}/shop/${slug}` : `https://tekbiz.vercel.app/shop/${slug}`; if (navigator.share) { navigator.share({ title: name, url: shareUrl }); } else { navigator.clipboard.writeText(shareUrl); alert('Lien copié !'); } }}>
             <IconLink size={14} /> {t('shareStore')}
           </button>
         </div>
