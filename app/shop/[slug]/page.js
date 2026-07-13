@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { IconStore, IconMapPin, IconTag, IconShoppingBag, IconShoppingCart, IconClipboard, IconCheckCircle, IconWave, IconCreditCard } from '@/lib/icons';
+import { IconStore, IconMapPin, IconTag, IconShoppingBag, IconShoppingCart, IconClipboard, IconCheckCircle, IconWaveLogo, IconOrangeMoneyLogo } from '@/lib/icons';
 
 function formatCFA(n) { return new Intl.NumberFormat('fr-FR').format(n); }
 
@@ -320,7 +320,7 @@ export default function ShopPage() {
                       width: '100%', 
                       padding: '14px 12px', 
                       borderRadius: 'var(--radius-md)', 
-                      border: `2px solid ${checkoutForm.payment === 'wave' ? '#3B82F6' : 'var(--border)'}`, 
+                      border: `2px solid ${checkoutForm.payment === 'wave' ? '#00A3E0' : 'var(--border)'}`, 
                       background: checkoutForm.payment === 'wave' ? '#EFF6FF' : 'var(--surface)', 
                       fontSize: '0.875rem', 
                       fontWeight: 650, 
@@ -328,16 +328,16 @@ export default function ShopPage() {
                       display: 'flex', 
                       alignItems: 'center', 
                       gap: 10,
-                      color: checkoutForm.payment === 'wave' ? '#3B82F6' : 'var(--text)'
+                      color: checkoutForm.payment === 'wave' ? '#00A3E0' : 'var(--text)'
                     }}>
-                    <IconWave size={18} color={checkoutForm.payment === 'wave' ? '#3B82F6' : 'var(--text-secondary)'} /> Wave
+                    <IconWaveLogo size={18} /> Wave
                   </button>
                   <button type="button" onClick={() => setCheckoutForm(p => ({ ...p, payment: 'orange_money' }))}
                     style={{ 
                       width: '100%', 
                       padding: '14px 12px', 
                       borderRadius: 'var(--radius-md)', 
-                      border: `2px solid ${checkoutForm.payment === 'orange_money' ? '#F97316' : 'var(--border)'}`, 
+                      border: `2px solid ${checkoutForm.payment === 'orange_money' ? '#FF6600' : 'var(--border)'}`, 
                       background: checkoutForm.payment === 'orange_money' ? '#FFF7ED' : 'var(--surface)', 
                       fontSize: '0.875rem', 
                       fontWeight: 650, 
@@ -345,9 +345,9 @@ export default function ShopPage() {
                       display: 'flex', 
                       alignItems: 'center', 
                       gap: 10,
-                      color: checkoutForm.payment === 'orange_money' ? '#F97316' : 'var(--text)'
+                      color: checkoutForm.payment === 'orange_money' ? '#FF6600' : 'var(--text)'
                     }}>
-                    <IconCreditCard size={18} color={checkoutForm.payment === 'orange_money' ? '#F97316' : 'var(--text-secondary)'} /> Orange Money
+                    <IconOrangeMoneyLogo size={18} /> Orange Money
                   </button>
                 </div>
               </div>

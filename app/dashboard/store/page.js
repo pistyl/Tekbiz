@@ -3,7 +3,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useLanguage } from '@/lib/i18n';
 import { getSession, logout } from '@/lib/auth';
-import { IconCamera, IconStore, IconGlobe, IconEye, IconLogOut, IconCheck, IconCheckCircle, IconWave, IconCreditCard } from '@/lib/icons';
+import { IconCamera, IconStore, IconGlobe, IconEye, IconLogOut, IconCheck, IconCheckCircle, IconWaveLogo, IconOrangeMoneyLogo } from '@/lib/icons';
 
 function StoreSettings() {
   const { t } = useLanguage();
@@ -409,38 +409,38 @@ function StoreSettings() {
                         flex: 1, 
                         padding: '10px 8px', 
                         borderRadius: 'var(--radius-md)', 
-                        border: `1.5px solid ${subMethod === 'wave' ? '#3B82F6' : 'var(--border)'}`, 
+                        border: `1.5px solid ${subMethod === 'wave' ? '#00A3E0' : 'var(--border)'}`, 
                         background: subMethod === 'wave' ? '#EFF6FF' : 'transparent', 
                         fontSize: '0.75rem', 
                         fontWeight: 600,
                         display: 'flex', 
                         alignItems: 'center', 
                         justifyContent: 'center', 
-                        gap: 6,
-                        color: subMethod === 'wave' ? '#3B82F6' : 'var(--text-secondary)',
+                        gap: 8,
+                        color: subMethod === 'wave' ? '#00A3E0' : 'var(--text-secondary)',
                         transition: 'all 0.2s',
                         cursor: 'pointer'
                       }}>
-                      <IconWave size={14} color={subMethod === 'wave' ? '#3B82F6' : 'var(--text-secondary)'} /> Wave
+                      <IconWaveLogo size={18} /> Wave
                     </button>
                     <button type="button" onClick={() => setSubMethod('orange_money')}
                       style={{ 
                         flex: 1, 
                         padding: '10px 8px', 
                         borderRadius: 'var(--radius-md)', 
-                        border: `1.5px solid ${subMethod === 'orange_money' ? '#F97316' : 'var(--border)'}`, 
+                        border: `1.5px solid ${subMethod === 'orange_money' ? '#FF6600' : 'var(--border)'}`, 
                         background: subMethod === 'orange_money' ? '#FFF7ED' : 'transparent', 
                         fontSize: '0.75rem', 
                         fontWeight: 600,
                         display: 'flex', 
                         alignItems: 'center', 
                         justifyContent: 'center', 
-                        gap: 6,
-                        color: subMethod === 'orange_money' ? '#F97316' : 'var(--text-secondary)',
+                        gap: 8,
+                        color: subMethod === 'orange_money' ? '#FF6600' : 'var(--text-secondary)',
                         transition: 'all 0.2s',
                         cursor: 'pointer'
                       }}>
-                      <IconCreditCard size={14} color={subMethod === 'orange_money' ? '#F97316' : 'var(--text-secondary)'} /> Orange
+                      <IconOrangeMoneyLogo size={18} /> Orange
                     </button>
                   </div>
                 </div>
