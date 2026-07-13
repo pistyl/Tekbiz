@@ -428,7 +428,7 @@ function PricingSection() {
               <h3 className="plan-name">{t('freePlan')}</h3>
               <div className="plan-price">0 <span className="price-unit">FCFA</span></div>
               <div className="plan-features">
-                {[t('upTo20Products'), t('mobilePayments'), t('orderManagement')].map((f, i) => (
+                {[t('upTo5Products'), t('mobilePayments'), t('orderManagement')].map((f, i) => (
                   <div key={i} className="feature-line">
                     <IconCheck size={16} color="var(--success)" /> <span>{f}</span>
                   </div>
