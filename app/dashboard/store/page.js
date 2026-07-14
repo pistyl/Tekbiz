@@ -5,6 +5,7 @@ import { useLanguage } from '@/lib/i18n';
 import { getSession, logout } from '@/lib/auth';
 import { IconCamera, IconStore, IconGlobe, IconEye, IconLogOut, IconCheck, IconCheckCircle, IconWaveLogo, IconOrangeMoneyLogo } from '@/lib/icons';
 import PhoneInput from 'react-phone-number-input';
+import { formatToE164 } from '@/lib/phone';
 
 function StoreSettings() {
   const { t } = useLanguage();
@@ -52,7 +53,7 @@ function StoreSettings() {
               name: data.store.name || '',
               slug: data.store.slug || '',
               description: data.store.description || '',
-              phone: data.store.phone || s.phone || '',
+              phone: formatToE164(data.store.phone || s.phone || ''),
               address: data.store.address || '',
               category: data.store.category || '',
             }));
@@ -64,7 +65,7 @@ function StoreSettings() {
         name: s.store.name || '',
         slug: s.store.slug || '',
         description: s.store.description || '',
-        phone: s.store.phone || s.phone || '',
+        phone: formatToE164(s.store.phone || s.phone || ''),
         address: s.store.address || '',
         category: s.store.category || '',
         logo: s.store.logo || '',
