@@ -590,6 +590,30 @@ NEXT_PUBLIC_APP_URL="https://tekbiz.sn"
 NEXT_PUBLIC_APP_NAME="TEKBIZ"
 ```
 
+## Phase 3 — Stockage des images avec Cloudinary
+
+Par défaut, l'application convertit les images en Base64 pour un fonctionnement autonome sans dépendance. Pour la production, il est fortement conseillé d'utiliser un stockage externe pour éviter de saturer la base de données.
+
+L'application intègre un support natif pour **Cloudinary**.
+
+### 3.1 Créer un compte Cloudinary
+1. Créez un compte gratuit sur [Cloudinary](https://cloudinary.com/).
+2. Copiez vos identifiants depuis le tableau de bord Cloudinary :
+   * **Cloud Name**
+   * **API Key**
+   * **API Secret**
+
+### 3.2 Configurer l'environnement
+Ajoutez ces clés dans votre fichier `.env` ou `.env.local` en production :
+
+```env
+CLOUDINARY_CLOUD_NAME="votre-cloud-name"
+CLOUDINARY_API_KEY="votre-api-key"
+CLOUDINARY_API_SECRET="votre-api-secret"
+```
+
+Une fois ces variables configurées, la route d'upload téléversera automatiquement toutes les images de produits, logos et bannières vers Cloudinary et enregistrera des URLs sécurisées à la place des chaînes Base64.
+
 ---
 
 ## Résumé des étapes
@@ -603,10 +627,11 @@ NEXT_PUBLIC_APP_NAME="TEKBIZ"
 | 5 | Créer compte UnitechPay + obtenir clés API | 1-5 jours* |
 | 6 | Intégrer UnitechPay (initiate + webhook) | 2-3h |
 | 7 | Tester en mode sandbox | 1h |
-| 8 | Acheter domaine tekbiz.sn | 1 jour |
-| 9 | Déployer sur Vercel ou VPS | 1-2h |
-| 10 | Configurer SSL + DNS wildcard | 1h |
-| 11 | Tests finaux + passage UnitechPay en production | 1h |
+| 8 | Configurer Cloudinary (Upload d'images) | 30 min |
+| 9 | Acheter domaine tekbiz.sn | 1 jour |
+| 10 | Déployer sur Vercel ou VPS | 1-2h |
+| 11 | Configurer SSL + DNS wildcard | 1h |
+| 12 | Tests finaux + passage UnitechPay en production | 1h |
 
 > * L'obtention des clés de paiement nécessite la validation de documents légaux (NINEA, RCCM).
 
