@@ -5,9 +5,20 @@ export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const storeId = searchParams.get('storeId');
+    const id = searchParams.get('id');
+
+    if (id) {
+      const product = await prisma.product.findUnique({
+        where: { id }
+      });
+      if (!product) {
+        return NextResponse.json({ error: 'Produit introuvable' }, { status: 404 });
+      }
+      return NextResponse.json({ success: true, product });
+    }
 
     if (!storeId) {
-      return NextResponse.json({ error: 'storeId est requis' }, { status: 400 });
+      return NextResponse.json({ error: 'storeId ou id est requis' }, { status: 400 });
     }
 
     const products = await prisma.product.findMany({
@@ -79,3 +90,52 @@ export async function POST(request) {
     return NextResponse.json({ error: 'Erreur lors de la création du produit' }, { status: 500 });
   }
 }
+
+export async function PUT(request) {
+  try {
+    const { id, name, price, description, category, stock, images } = await request.json();
+
+    if (!id || !name || !price) {
+      return NextResponse.json({ error: 'Informations incomplètes' }, { status: 400 });
+    }
+
+    const product = await prisma.product.update({
+      where: { id },
+      data: {
+        name,
+        price: parseInt(price),
+        description,
+        category,
+        quantity: parseInt(stock) || 0,
+        inStock: parseInt(stock) > 0,
+        images: images || []
+      }
+    });
+
+    return NextResponse.json({ success: true, product });
+  } catch (error) {
+    console.error('Update product error:', error);
+    return NextResponse.json({ error: 'Erreur lors de la modification du produit' }, { status: 500 });
+  }
+}
+
+export async function DELETE(request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json({ error: 'id est requis' }, { status: 400 });
+    }
+
+    await prisma.product.delete({
+      where: { id }
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Delete product error:', error);
+    return NextResponse.json({ error: 'Erreur lors de la suppression du produit' }, { status: 500 });
+  }
+}
+

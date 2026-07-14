@@ -91,6 +91,19 @@ export default function ProductsPage() {
               </div>
               <div className="product-card-body">
                 <div className="product-card-name">{product.name}</div>
+                {product.description && (
+                  <div style={{ 
+                    fontSize: '0.75rem', 
+                    color: 'var(--text-secondary)', 
+                    marginTop: 4, 
+                    marginBottom: 8,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap'
+                  }}>
+                    {product.description}
+                  </div>
+                )}
                 <div className="product-card-price">{formatCFA(product.price)} F</div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 6 }}>
                   <span className={`badge ${product.inStock ? 'badge-success' : 'badge-danger'}`}>
