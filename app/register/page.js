@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { LanguageProvider, useLanguage } from '@/lib/i18n';
 import { register, isLoggedIn } from '@/lib/auth';
 import { IconWarning, IconLink } from '@/lib/icons';
+import PhoneInput from 'react-phone-number-input';
 
 const categories = [
   'Mode & Vêtements', 'Électronique', 'Alimentation', 'Beauté & Cosmétiques',
@@ -94,7 +95,15 @@ function RegisterForm() {
                 </div>
                 <div className="input-group">
                   <label htmlFor="reg-phone">{t('phone')}</label>
-                  <input id="reg-phone" type="tel" className="input" placeholder="+221 77 123 45 67" value={form.phone} onChange={e => update('phone', e.target.value)} required />
+                  <PhoneInput
+                    id="reg-phone"
+                    international
+                    defaultCountry="SN"
+                    placeholder="+221 77 123 45 67"
+                    value={form.phone}
+                    onChange={val => update('phone', val || '')}
+                    required
+                  />
                 </div>
                 <div className="input-group">
                   <label htmlFor="reg-pw">{t('password')}</label>

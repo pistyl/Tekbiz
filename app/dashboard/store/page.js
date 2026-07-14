@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useLanguage } from '@/lib/i18n';
 import { getSession, logout } from '@/lib/auth';
 import { IconCamera, IconStore, IconGlobe, IconEye, IconLogOut, IconCheck, IconCheckCircle, IconWaveLogo, IconOrangeMoneyLogo } from '@/lib/icons';
+import PhoneInput from 'react-phone-number-input';
 
 function StoreSettings() {
   const { t } = useLanguage();
@@ -327,7 +328,14 @@ function StoreSettings() {
 
         <div className="input-group">
           <label>{t('phone')}</label>
-          <input className="input" value={form.phone} onChange={e => update('phone', e.target.value)} required />
+          <PhoneInput
+            international
+            defaultCountry="SN"
+            placeholder="+221 77 123 45 67"
+            value={form.phone}
+            onChange={val => update('phone', val || '')}
+            required
+          />
         </div>
 
         <div className="input-group">

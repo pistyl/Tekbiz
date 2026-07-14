@@ -64,7 +64,7 @@ export async function POST(request) {
     console.warn('UnitechPay non configuré ou invalide, redirection de démo activée :', payment);
     return NextResponse.json({
       success: true,
-      redirectUrl: `/shop/payment-success?order=${order.id}`,
+      redirectUrl: `/api/payments/success?order=${order.id}`,
       orderNumber: order.orderNumber,
       orderId: order.id,
       isDemo: true

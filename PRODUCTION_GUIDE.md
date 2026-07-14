@@ -265,79 +265,107 @@ export async function login(email, password) {
 }
 ```
 
-> **Note :** Pour une auth plus robuste, utilisez des JWT ou NextAuth.js v5.
+> **Note :** Pour une auth plus robuste, u## Phase 2 — Intégration UnitechPay (Paiements)
 
----
+### 2.1 Créer un compte UnitechPay
 
-## Phase 2 — Intégration PayTech (Paiements)
-
-### 2.1 Créer un compte PayTech
-
-1. Aller sur [https://paytech.sn](https://paytech.sn)
+1. Aller sur [https://unitech.sn](https://unitech.sn) (ou portail marchand UnitechPay)
 2. Créer un **compte marchand**
-3. Documents requis :
-   - NINEA (Numéro d'Identification National des Entreprises)
-   - RCCM (Registre du Commerce)
-   - Pièce d'identité du gérant
-   - RIB bancaire
-4. Récupérer vos **clés API** dans le dashboard PayTech :
-   - `PAYTECH_API_KEY`
-   - `PAYTECH_API_SECRET`
+3. Obtenir vos clés d'API dans votre espace marchand.
+4. Récupérer votre **clé API** :
+   - `UNITECHPAY_API_KEY`
 
 ### 2.2 Variables d'environnement
 
 ```env
-PAYTECH_API_KEY=pk_live_xxxxxxxxxxxxx
-PAYTECH_API_SECRET=sk_live_xxxxxxxxxxxxx
-PAYTECH_ENV=production    # "test" pour sandbox
+UNITECHPAY_API_KEY=4c53ad12e1e4bcaa5d65576fadfef7618dfa7fd495124f7d8093968d5d0e505c
 NEXT_PUBLIC_APP_URL=https://tekbiz.sn
 ```
 
-### 2.3 Créer le client PayTech
+### 2.3 Créer le client UnitechPay
 
-Créer `lib/paytech.js` :
+Créer `lib/unitechpay.js` :
 
 ```js
-const PAYTECH_BASE_URL = 'https://paytech.sn/api/payment';
+import crypto from 'crypto';
 
-export async function createPayment({ amount, description, orderId, customerName, customerPhone }) {
-  const response = await fetch(`${PAYTECH_BASE_URL}/request-payment`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'API_KEY': process.env.PAYTECH_API_KEY,
-      'API_SECRET': process.env.PAYTECH_API_SECRET,
-    },
-    body: JSON.stringify({
-      item_name: description,
-      item_price: amount,
-      currency: 'XOF',
-      ref_command: orderId,
-      command_name: `Commande ${orderId}`,
-      env: process.env.PAYTECH_ENV || 'test',
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/api/payments/success?order=${orderId}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/api/payments/cancel?order=${orderId}`,
-      ipn_url: `${process.env.NEXT_PUBLIC_APP_URL}/api/payments/webhook`,
-      custom_field: JSON.stringify({
-        orderId,
-        customerName,
-        customerPhone,
-      }),
-    }),
-  });
+const UNITECHPAY_API_URL = 'https://api.unitech.sn/api.php';
 
-  const data = await response.json();
-  return data; // { success: 1, redirect_url: "https://paytech.sn/..." }
+export async function createPayment({ amount, description, orderId, customerName, customerPhone, paymentMethod, appUrl }) {
+  try {
+    const apiKey = process.env.UNITECHPAY_API_KEY;
+    if (!apiKey) return { success: 0, error: 'API key missing' };
+
+    const isOrange = paymentMethod === 'orange_money' || paymentMethod === 'orange';
+    const action = isOrange ? 'create_orange_maxit' : 'create_wave_payment';
+    
+    let runtimeAppUrl = appUrl || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    if (!runtimeAppUrl.includes('localhost') && runtimeAppUrl.startsWith('http://')) {
+      runtimeAppUrl = runtimeAppUrl.replace('http://', 'https://');
+    }
+
+    const cleanPhone = customerPhone.replace(/\D/g, '');
+    const customerNumber = cleanPhone.length >= 9 
+      ? cleanPhone.substring(cleanPhone.length - 9) 
+      : cleanPhone;
+
+    const payload = {
+      amount: Math.ceil(amount),
+      reference: orderId,
+      description: description || `Commande ${orderId}`,
+      customer_number: customerNumber,
+      customer_phone: customerPhone,
+      customer_name: customerName,
+      phone: customerPhone,
+      callback_url: `${runtimeAppUrl}/api/payments/webhook`,
+      success_url: `${runtimeAppUrl}/api/payments/success?order=${orderId}`,
+      cancel_url: `${runtimeAppUrl}/api/payments/cancel?order=${orderId}`,
+    };
+
+    const response = await fetch(`${UNITECHPAY_API_URL}?action=${action}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) return { success: 0, error: `HTTP ${response.status}` };
+
+    const data = await response.json();
+    if (!data.success) return { success: 0, error: data.message };
+
+    const resData = data.data || data;
+    const redirectUrl = resData.payment_url || resData.deep_link || resData.redirect_url;
+
+    return {
+      success: 1,
+      redirect_url: redirectUrl,
+      transaction_id: resData.transaction_id || resData.reference
+    };
+  } catch (error) {
+    return { success: 0, error: error.message };
+  }
 }
 
-export function verifyWebhookSignature(body, signature) {
-  // Vérifier la signature HMAC du webhook PayTech
-  const crypto = require('crypto');
-  const hash = crypto
-    .createHmac('sha256', process.env.PAYTECH_API_SECRET)
-    .update(JSON.stringify(body))
+export function verifyWebhookSignature(rawBody, signature) {
+  const apiKey = process.env.UNITECHPAY_API_KEY;
+  if (!apiKey) return false;
+  
+  const expectedSignature = crypto
+    .createHmac('sha256', apiKey)
+    .update(rawBody)
     .digest('hex');
-  return hash === signature;
+
+  try {
+    return crypto.timingSafeEqual(
+      Buffer.from(expectedSignature, 'hex'),
+      Buffer.from(signature, 'hex')
+    );
+  } catch {
+    return expectedSignature === signature;
+  }
 }
 ```
 
@@ -348,15 +376,12 @@ Créer `app/api/payments/initiate/route.js` :
 ```js
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { createPayment } from '@/lib/paytech';
+import { createPayment } from '@/lib/unitechpay';
 
 export async function POST(request) {
   const { items, customerName, customerPhone, customerAddress, storeId, paymentMethod } = await request.json();
-
-  // Calculer le total
   const totalAmount = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-  // Créer la commande en base
   const order = await prisma.order.create({
     data: {
       orderNumber: `TK-${Date.now().toString(36).toUpperCase()}`,
@@ -376,13 +401,17 @@ export async function POST(request) {
     }
   });
 
-  // Initier le paiement PayTech
+  const host = request.headers.get('host');
+  const protocol = host.includes('localhost') ? 'http' : 'https';
+
   const payment = await createPayment({
     amount: totalAmount,
     description: `Commande ${order.orderNumber}`,
     orderId: order.id,
     customerName,
     customerPhone,
+    paymentMethod,
+    appUrl: `${protocol}://${host}`
   });
 
   if (payment.success === 1) {
@@ -404,27 +433,38 @@ Créer `app/api/payments/webhook/route.js` :
 ```js
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { verifyWebhookSignature } from '@/lib/unitechpay';
 
 export async function POST(request) {
-  const body = await request.json();
+  const rawBody = await request.text();
+  const signature = request.headers.get('x-unitechpay-signature');
 
-  // PayTech envoie : type_event, ref_command, item_price, payment_method, etc.
-  const { type_event, ref_command, custom_field } = body;
+  if (!signature || !verifyWebhookSignature(rawBody, signature)) {
+    return NextResponse.json({ error: 'Signature invalide' }, { status: 401 });
+  }
 
-  if (type_event === 'sale_complete') {
-    const { orderId } = JSON.parse(custom_field);
+  const { event, reference, status, transaction_id } = JSON.parse(rawBody);
 
-    // Mettre à jour la commande
-    await prisma.order.update({
-      where: { id: orderId },
-      data: {
-        paymentStatus: 'COMPLETED',
-        status: 'CONFIRMED',
-        paymentRef: ref_command,
-      }
-    });
-
-    // TODO: Envoyer notification au marchand (SMS, email, push)
+  if (event === 'payment_completed' && status === 'completed') {
+    if (reference.startsWith('SUB_')) {
+      const storeId = reference.substring(4);
+      await prisma.store.update({
+        where: { id: storeId },
+        data: {
+          plan: 'PRO',
+          subscriptionEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+        }
+      });
+    } else {
+      await prisma.order.update({
+        where: { id: reference },
+        data: {
+          paymentStatus: 'COMPLETED',
+          status: 'CONFIRMED',
+          paymentRef: String(transaction_id || ''),
+        }
+      });
+    }
   }
 
   return NextResponse.json({ received: true });
@@ -437,17 +477,18 @@ export async function POST(request) {
 Client → Valide panier → POST /api/payments/initiate
                              ↓
                     Crée commande (PENDING)
-                    Appelle PayTech API
+                    Appelle UnitechPay API
                              ↓
                     Retourne redirect_url
                              ↓
-Client → Redirigé vers PayTech → Paie via Wave/OM
+Client → Redirigé vers UnitechPay (Wave/OM) → Effectue le paiement
                              ↓
-              PayTech → POST /api/payments/webhook
+              UnitechPay → POST /api/payments/webhook
                              ↓
-                   Commande → CONFIRMED
-                   Notification marchand
+                    Commande → CONFIRMED
                              ↓
+Client → Redirigé vers success_url → Page de confirmation
+```                          ↓
 Client → Redirigé vers success_url → Page de confirmation
 ```
 
@@ -526,9 +567,9 @@ sudo certbot --nginx -d tekbiz.sn -d "*.tekbiz.sn"
 - [ ] **Validation des inputs** côté serveur (email, téléphone, prix)
 - [ ] **CORS** configuré pour n'accepter que votre domaine
 - [ ] **Variables .env** jamais commitées (vérifier `.gitignore`)
-- [ ] **Webhook PayTech** vérifié avec signature HMAC
+- [ ] **Webhook UnitechPay** vérifié avec signature HMAC
 - [ ] **Backups automatiques** de la base PostgreSQL
-- [ ] **Tests sandbox PayTech** avant de passer en production
+- [ ] **Tests en mode sandbox / test** de l'API de paiement
 - [ ] **Monitoring** : Vercel Analytics ou Sentry pour les erreurs
 
 ### Variables d'environnement production
@@ -541,10 +582,8 @@ DATABASE_URL="postgresql://tekbiz:MOT_DE_PASSE_FORT@db.supabase.co:5432/tekbiz"
 NEXTAUTH_SECRET="clé-secrète-de-64-caractères-minimum"
 NEXTAUTH_URL="https://tekbiz.sn"
 
-# PayTech (PRODUCTION)
-PAYTECH_API_KEY="pk_live_xxxxx"
-PAYTECH_API_SECRET="sk_live_xxxxx"
-PAYTECH_ENV="production"
+# UnitechPay (PRODUCTION)
+UNITECHPAY_API_KEY="4c53ad12e1e4bcaa5d65576fadfef7618dfa7fd495124f7d8093968d5d0e505c"
 
 # App
 NEXT_PUBLIC_APP_URL="https://tekbiz.sn"
@@ -561,15 +600,15 @@ NEXT_PUBLIC_APP_NAME="TEKBIZ"
 | 2 | Ajouter Prisma + schéma + migrations | 1h |
 | 3 | Créer les API routes (auth, produits, commandes) | 3-4h |
 | 4 | Remplacer localStorage par appels API | 2h |
-| 5 | Créer compte PayTech + obtenir clés API | 1-5 jours* |
-| 6 | Intégrer PayTech (initiate + webhook) | 2-3h |
+| 5 | Créer compte UnitechPay + obtenir clés API | 1-5 jours* |
+| 6 | Intégrer UnitechPay (initiate + webhook) | 2-3h |
 | 7 | Tester en mode sandbox | 1h |
 | 8 | Acheter domaine tekbiz.sn | 1 jour |
 | 9 | Déployer sur Vercel ou VPS | 1-2h |
 | 10 | Configurer SSL + DNS wildcard | 1h |
-| 11 | Tests finaux + passage PayTech en production | 1h |
+| 11 | Tests finaux + passage UnitechPay en production | 1h |
 
-> \* L'obtention des clés PayTech nécessite la validation de documents légaux (NINEA, RCCM).
+> * L'obtention des clés de paiement nécessite la validation de documents légaux (NINEA, RCCM).
 
 ---
 

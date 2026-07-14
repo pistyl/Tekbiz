@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { IconStore, IconMapPin, IconTag, IconShoppingBag, IconShoppingCart, IconClipboard, IconCheckCircle, IconWaveLogo, IconOrangeMoneyLogo, IconArrowLeft } from '@/lib/icons';
 import { getSession } from '@/lib/auth';
+import PhoneInput from 'react-phone-number-input';
 
 function formatCFA(n) { return new Intl.NumberFormat('fr-FR').format(n); }
 
@@ -322,7 +323,14 @@ export default function ShopPage() {
               </div>
               <div className="input-group">
                 <label>Téléphone</label>
-                <input className="input" type="tel" placeholder="+221 7X XXX XX XX" value={checkoutForm.phone} onChange={e => setCheckoutForm(p => ({ ...p, phone: e.target.value }))} required />
+                <PhoneInput
+                  international
+                  defaultCountry="SN"
+                  placeholder="+221 7X XXX XX XX"
+                  value={checkoutForm.phone}
+                  onChange={val => setCheckoutForm(p => ({ ...p, phone: val || '' }))}
+                  required
+                />
               </div>
               <div className="input-group">
                 <label>Adresse de livraison</label>

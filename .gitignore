@@ -4,5 +4,4 @@ node_modules
 .env.*
 .next
 powershell.bat
-
-
+.git_corrupted/

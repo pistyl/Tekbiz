@@ -4,6 +4,7 @@
    ======================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap');
+@import 'react-phone-number-input/style.css';
 
 /* --- CSS Variables --- */
 :root {
@@ -621,3 +622,96 @@ h4 { font-size: 1.125rem; font-weight: 600; }
 
 /* --- Selection --- */
 ::selection { background: var(--primary-glow); color: var(--primary-dark); }
+
+/* --- Custom react-phone-number-input styling overrides --- */
+.PhoneInput {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+.PhoneInputCountry {
+  display: flex;
+  align-items: center;
+  background: var(--bg-secondary);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0 var(--space-3);
+  height: 48px;
+  transition: all var(--duration-fast);
+  cursor: pointer;
+}
+
+.PhoneInputCountry:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-glow);
+  background: var(--bg);
+}
+
+.PhoneInputCountrySelect {
+  cursor: pointer;
+}
+
+.PhoneInputCountryIcon {
+  width: 24px;
+  height: 18px;
+  border-radius: 2px;
+  overflow: hidden;
+  box-shadow: var(--shadow-xs);
+  background: transparent;
+}
+
+.PhoneInputCountryIconImg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.PhoneInputCountrySelectArrow {
+  margin-left: 6px;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid var(--text-secondary);
+  display: inline-block;
+  vertical-align: middle;
+  opacity: 0.7;
+}
+
+.PhoneInputInput {
+  flex: 1;
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-secondary);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  transition: all var(--duration-fast);
+  outline: none;
+  height: 48px;
+}
+
+.PhoneInputInput:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-glow);
+  background: var(--bg);
+}
+
+/* Dark mode adjustments for react-phone-number-input */
+@media (prefers-color-scheme: dark) {
+  .PhoneInputCountry {
+    background: var(--surface);
+    border-color: var(--border);
+  }
+  .PhoneInputCountrySelect {
+    background: var(--surface);
+    color: var(--text);
+  }
+  .PhoneInputInput {
+    background: var(--surface);
+    border-color: var(--border);
+  }
+  .PhoneInputInput:focus {
+    background: var(--bg);
+  }
+}
