@@ -230,6 +230,19 @@ export default function ShopPage() {
               </div>
               <div className="product-card-body">
                 <div className="product-card-name">{p.name}</div>
+                {p.description && (
+                  <div style={{ 
+                    fontSize: '0.75rem', 
+                    color: 'var(--text-secondary)', 
+                    marginTop: 4, 
+                    marginBottom: 4,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap'
+                  }}>
+                    {p.description}
+                  </div>
+                )}
                 <div className="product-card-price">{formatCFA(p.price)} F</div>
               </div>
             </div>
