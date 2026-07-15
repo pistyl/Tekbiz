@@ -94,6 +94,17 @@ function DashboardShell({ children }) {
     };
   }, [router]);
 
+  useEffect(() => {
+    const handleUpdate = () => {
+      const s = getSession();
+      if (s) setSession(s);
+    };
+    window.addEventListener('tekbiz-session-update', handleUpdate);
+    return () => {
+      window.removeEventListener('tekbiz-session-update', handleUpdate);
+    };
+  }, []);
+
   const handleLogout = () => {
     logout();
     router.replace('/login');
@@ -144,7 +155,18 @@ function DashboardShell({ children }) {
       {/* Top Header */}
       <header style={{ background: 'var(--surface)', borderBottom: '1px solid var(--border)', padding: 'env(safe-area-inset-top, 0px) 16px 0', height: 'calc(56px + env(safe-area-inset-top, 0px))', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 40 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ width: 36, height: 36, borderRadius: 'var(--radius-md)', background: 'var(--gradient-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: '0.875rem' }}>{userInitial}</div>
+          {session?.store?.logo ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img 
+              src={session.store.logo} 
+              alt="Logo boutique" 
+              style={{ width: 36, height: 36, borderRadius: 'var(--radius-md)', objectFit: 'cover', border: '1px solid var(--border)' }} 
+            />
+          ) : (
+            <div style={{ width: 36, height: 36, borderRadius: 'var(--radius-md)', background: 'var(--gradient-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: '0.875rem' }}>
+              {userInitial}
+            </div>
+          )}
           <div>
             <div style={{ fontWeight: 700, fontSize: '0.9375rem', lineHeight: 1.2 }}>{storeName}</div>
             <div style={{ fontSize: '0.6875rem', color: 'var(--text-tertiary)' }}>{storeSlug}.tekbiz.sn</div>

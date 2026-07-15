@@ -205,6 +205,7 @@ function StoreSettings() {
           };
           localStorage.setItem('tekbiz_session', JSON.stringify(updatedSession));
           setSession(updatedSession);
+          window.dispatchEvent(new Event('tekbiz-session-update'));
           setSaved(true);
         } else {
           alert(result.error || 'Erreur lors de la sauvegarde');
