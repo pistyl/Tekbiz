@@ -208,135 +208,71 @@ export default function DashboardHome() {
         </div>
       )}
 
-      {/* Filtre de date personnalisé (Permanent, sans layout shift ni dropdown instable) */}
+      {/* Filtre de date compact */}
       <div 
         style={{ 
           background: 'var(--surface)', 
           borderRadius: 'var(--radius-lg)', 
-          padding: '16px', 
+          padding: '10px 16px', 
           marginBottom: 20, 
           boxShadow: 'var(--shadow-sm)',
           border: '1px solid var(--border)',
           display: 'flex',
-          flexDirection: 'column',
-          gap: 12
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: 10
         }}
       >
-        <h4 style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', margin: 0, fontWeight: 700 }}>
+        <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
           Période d'analyse
-        </h4>
+        </span>
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', justifyContent: 'flex-end', flex: 1 }}>
+          <select 
+            value={filterMode} 
+            onChange={(e) => setFilterMode(e.target.value)}
+            className="input"
+            style={{ 
+              padding: '6px 12px', 
+              fontSize: '0.8125rem', 
+              width: 'auto', 
+              height: 36, 
+              borderRadius: 'var(--radius-md)', 
+              borderColor: 'var(--border)',
+              background: 'var(--bg-secondary)',
+              cursor: 'pointer'
+            }}
+          >
+            <option value="all">Tout l'historique</option>
+            <option value="today">Aujourd'hui</option>
+            <option value="month">Ce mois-ci</option>
+            <option value="custom-date">Jour précis...</option>
+            <option value="custom-month">Mois précis...</option>
+          </select>
 
-        {/* Boutons rapides */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
-          <button 
-            type="button"
-            onClick={() => setFilterMode('all')}
-            style={{
-              padding: '10px 6px',
-              fontSize: '0.75rem',
-              fontWeight: 700,
-              borderRadius: 'var(--radius-md)',
-              border: '1.5px solid var(--border)',
-              background: filterMode === 'all' ? 'var(--primary)' : 'var(--bg-secondary)',
-              color: filterMode === 'all' ? 'white' : 'var(--text-main)',
-              cursor: 'pointer',
-              transition: 'all 0.2s'
-            }}
-          >
-            Tout l'historique
-          </button>
-          <button 
-            type="button"
-            onClick={() => setFilterMode('today')}
-            style={{
-              padding: '10px 6px',
-              fontSize: '0.75rem',
-              fontWeight: 700,
-              borderRadius: 'var(--radius-md)',
-              border: '1.5px solid var(--border)',
-              background: filterMode === 'today' ? 'var(--primary)' : 'var(--bg-secondary)',
-              color: filterMode === 'today' ? 'white' : 'var(--text-main)',
-              cursor: 'pointer',
-              transition: 'all 0.2s'
-            }}
-          >
-            Aujourd'hui
-          </button>
-          <button 
-            type="button"
-            onClick={() => setFilterMode('month')}
-            style={{
-              padding: '10px 6px',
-              fontSize: '0.75rem',
-              fontWeight: 700,
-              borderRadius: 'var(--radius-md)',
-              border: '1.5px solid var(--border)',
-              background: filterMode === 'month' ? 'var(--primary)' : 'var(--bg-secondary)',
-              color: filterMode === 'month' ? 'white' : 'var(--text-main)',
-              cursor: 'pointer',
-              transition: 'all 0.2s'
-            }}
-          >
-            Ce mois-ci
-          </button>
-        </div>
-
-        {/* Inputs calendrier permanents */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 4, paddingTop: 12, borderTop: '1px solid var(--border-light)' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <span style={{ fontSize: '0.6875rem', color: 'var(--text-tertiary)', fontWeight: 600 }}>Filtrer par jour :</span>
+          {filterMode === 'custom-date' && (
             <input 
               type="date" 
               value={selectedDate} 
-              onChange={e => {
-                setSelectedDate(e.target.value);
-                setFilterMode('custom-date');
-              }}
-              onClick={() => setFilterMode('custom-date')}
-              style={{
-                padding: '10px 8px',
-                fontSize: '0.8125rem',
-                fontWeight: 600,
-                borderRadius: 'var(--radius-md)',
-                border: '1.5px solid var(--border)',
-                borderColor: filterMode === 'custom-date' ? 'var(--primary)' : 'var(--border)',
-                background: 'var(--bg-secondary)',
-                color: 'var(--text-main)',
-                outline: 'none',
-                cursor: 'pointer',
-                width: '100%',
-                boxShadow: filterMode === 'custom-date' ? '0 0 0 3px var(--primary-light)' : 'none'
-              }}
+              onChange={e => setSelectedDate(e.target.value)}
+              className="input"
+              style={{ padding: '6px 10px', fontSize: '0.8125rem', width: 'auto', height: 36, borderRadius: 'var(--radius-md)', background: 'var(--bg-secondary)' }}
             />
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <span style={{ fontSize: '0.6875rem', color: 'var(--text-tertiary)', fontWeight: 600 }}>Filtrer par mois :</span>
+          )}
+
+          {filterMode === 'custom-month' && (
             <input 
               type="month" 
               value={selectedMonth} 
-              onChange={e => {
-                setSelectedMonth(e.target.value);
-                setFilterMode('custom-month');
-              }}
-              onClick={() => setFilterMode('custom-month')}
-              style={{
-                padding: '10px 8px',
-                fontSize: '0.8125rem',
-                fontWeight: 600,
-                borderRadius: 'var(--radius-md)',
-                border: '1.5px solid var(--border)',
-                borderColor: filterMode === 'custom-month' ? 'var(--primary)' : 'var(--border)',
-                background: 'var(--bg-secondary)',
-                color: 'var(--text-main)',
-                outline: 'none',
-                cursor: 'pointer',
-                width: '100%',
-                boxShadow: filterMode === 'custom-month' ? '0 0 0 3px var(--primary-light)' : 'none'
-              }}
+              onChange={e => setSelectedMonth(e.target.value)}
+              className="input"
+              style={{ padding: '6px 10px', fontSize: '0.8125rem', width: 'auto', height: 36, borderRadius: 'var(--radius-md)', background: 'var(--bg-secondary)' }}
             />
-          </div>
+          )}
         </div>
       </div>
+
 
       {/* Somme Totale Historique des Ventes (Grand Encadré Premium) */}
       <div style={{ background: 'var(--gradient-primary)', borderRadius: 'var(--radius-lg)', padding: '20px 16px', color: 'white', marginBottom: 20, boxShadow: 'var(--shadow-md)' }}>
