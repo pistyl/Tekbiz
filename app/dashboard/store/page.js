@@ -171,7 +171,7 @@ function StoreSettings() {
       });
       const result = await res.json();
       if (result.success && result.redirectUrl) {
-        window.location.href = result.redirectUrl;
+        window.open(result.redirectUrl, '_blank');
       } else {
         alert(result.error || 'Erreur lors de l\'initiation de l\'abonnement');
       }
