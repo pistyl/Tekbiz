@@ -14,12 +14,84 @@ function DashboardShell({ children }) {
 
   useEffect(() => {
     const s = getSession();
+    let interval;
     if (!s) {
       router.replace('/login');
     } else {
       setSession(s);
       setLoading(false);
+
+      if (s.store?.id) {
+        let lastOrderIds = new Set();
+        let isInitial = true;
+
+        const playSound = () => {
+          try {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const playTone = (freq, type, duration, delay) => {
+              const osc = audioCtx.createOscillator();
+              const gain = audioCtx.createGain();
+              osc.type = type;
+              osc.frequency.setValueAtTime(freq, audioCtx.currentTime + delay);
+              gain.gain.setValueAtTime(0.08, audioCtx.currentTime + delay);
+              gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + delay + duration);
+              osc.connect(gain);
+              gain.connect(audioCtx.destination);
+              osc.start(audioCtx.currentTime + delay);
+              osc.stop(audioCtx.currentTime + delay + duration);
+            };
+
+            // Electronic cash-register chaching sound
+            playTone(987.77, 'sine', 0.08, 0); // B5 note
+            playTone(1318.51, 'sine', 0.22, 0.06); // E6 note
+          } catch (e) {
+            console.error('Audio play error:', e);
+          }
+        };
+
+        const checkNewOrders = async () => {
+          try {
+            const res = await fetch(`/api/orders?storeId=${s.store.id}`);
+            const result = await res.json();
+            if (result.success && result.orders) {
+              const currentOrders = result.orders;
+              const currentIds = new Set(currentOrders.map(o => o.id));
+
+              if (!isInitial) {
+                const newOrders = currentOrders.filter(o => !lastOrderIds.has(o.id));
+                if (newOrders.length > 0) {
+                  newOrders.forEach(order => {
+                    playSound();
+                    if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
+                      new Notification('Nouvelle commande ! 🎉', {
+                        body: `${order.customerName} a commandé pour ${new Intl.NumberFormat('fr-FR').format(order.totalAmount)} FCFA.`,
+                        icon: '/favicon.png'
+                      });
+                    }
+                  });
+                }
+              }
+
+              lastOrderIds = currentIds;
+              isInitial = false;
+            }
+          } catch (err) {
+            console.error('Failed to check new orders:', err);
+          }
+        };
+
+        if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'default') {
+          Notification.requestPermission();
+        }
+
+        checkNewOrders();
+        interval = setInterval(checkNewOrders, 10000);
+      }
     }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
   }, [router]);
 
   const handleLogout = () => {
