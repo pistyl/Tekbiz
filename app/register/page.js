@@ -23,6 +23,38 @@ function RegisterForm() {
   useEffect(() => {
     if (isLoggedIn()) router.replace('/dashboard');
   }, [router]);
+
+  const [nameAvailable, setNameAvailable] = useState(true);
+  const [nameChecking, setNameChecking] = useState(false);
+  const [nameSuggestions, setNameSuggestions] = useState([]);
+
+  useEffect(() => {
+    if (!form.storeName || form.storeName.trim().length === 0) {
+      setNameAvailable(true);
+      setNameChecking(false);
+      setNameSuggestions([]);
+      return;
+    }
+
+    const delayDebounce = setTimeout(async () => {
+      setNameChecking(true);
+      try {
+        const res = await fetch(`/api/store/check-name?name=${encodeURIComponent(form.storeName)}`);
+        const data = await res.json();
+        if (data.available !== undefined) {
+          setNameAvailable(data.available);
+          setNameSuggestions(data.suggestions || []);
+        }
+      } catch (err) {
+        console.error('Failed to check store name:', err);
+      } finally {
+        setNameChecking(false);
+      }
+    }, 400);
+
+    return () => clearTimeout(delayDebounce);
+  }, [form.storeName]);
+
   const update = (key, val) => { setError(''); setForm(prev => ({ ...prev, [key]: val })); };
 
   const handleSubmit = async (e) => {
@@ -117,6 +149,42 @@ function RegisterForm() {
                   <label htmlFor="reg-store">{t('storeName')}</label>
                   <input id="reg-store" className="input" placeholder="Ma Super Boutique" value={form.storeName} onChange={e => update('storeName', e.target.value)} required />
                 </div>
+                {nameChecking && (
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginTop: -8 }}>
+                    Vérification de la disponibilité...
+                  </span>
+                )}
+                {!nameAvailable && !nameChecking && (
+                  <div style={{ color: 'var(--danger)', fontSize: '0.8125rem', marginTop: -8, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    <span>Ce nom de boutique est déjà utilisé.</span>
+                    {nameSuggestions.length > 0 && (
+                      <div style={{ marginTop: 4, color: 'var(--text-secondary)' }}>
+                        Suggestions :{' '}
+                        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 4 }}>
+                          {nameSuggestions.map(s => (
+                            <button
+                              key={s}
+                              type="button"
+                              onClick={() => update('storeName', s)}
+                              style={{
+                                padding: '4px 10px',
+                                fontSize: '0.75rem',
+                                color: 'var(--primary)',
+                                border: '1px solid var(--primary)',
+                                borderRadius: 'var(--radius-full)',
+                                background: 'transparent',
+                                cursor: 'pointer',
+                                transition: 'all var(--duration-fast)'
+                              }}
+                            >
+                              {s}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
                 <div className="input-group">
                   <label htmlFor="reg-cat">{t('storeCategory')}</label>
                   <select id="reg-cat" className="input" value={form.storeCategory} onChange={e => update('storeCategory', e.target.value)} required>
@@ -133,7 +201,7 @@ function RegisterForm() {
                 </div>
                 <div style={{ display: 'flex', gap: 12 }}>
                   <button type="button" className="btn btn-secondary" onClick={() => setStep(1)} style={{ flex: 1 }}>← {t('back')}</button>
-                  <button type="submit" className="btn btn-primary" style={{ flex: 2 }} disabled={loading}>
+                  <button type="submit" className="btn btn-primary" style={{ flex: 2 }} disabled={loading || !nameAvailable || nameChecking}>
                     {loading ? t('loading') : t('createAccount')}
                   </button>
                 </div>
