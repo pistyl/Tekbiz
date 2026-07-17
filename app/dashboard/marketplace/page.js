@@ -1,12 +1,13 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { LanguageProvider, useLanguage } from '@/lib/i18n';
+import { useLanguage } from '@/lib/i18n';
 import { 
   IconStore, IconMapPin, IconTag, IconShoppingBag, IconShoppingCart, 
   IconClipboard, IconCheckCircle, IconWaveLogo, IconOrangeMoneyLogo, 
-  IconArrowLeft, IconSearch, IconChevronDown 
+  IconSearch, IconChevronDown 
 } from '@/lib/icons';
+import { getSession } from '@/lib/auth';
 import PhoneInput from 'react-phone-number-input';
 
 function formatCFA(n) { 
@@ -15,22 +16,7 @@ function formatCFA(n) {
 
 const bgColors = ['#FEF3C7', '#DBEAFE', '#D1FAE5', '#FCE7F3', '#E0E7FF', '#FEE2E2'];
 
-function LangToggle() {
-  const { lang, toggleLang } = useLanguage();
-  return (
-    <button 
-      onClick={toggleLang} 
-      className="lang-toggle-btn"
-      aria-label="Toggle language"
-    >
-      <span className={lang === 'fr' ? 'lang-toggle-active' : 'lang-toggle-inactive'}>FR</span>
-      <span style={{ opacity: 0.15 }}>|</span>
-      <span className={lang === 'wo' ? 'lang-toggle-active' : 'lang-toggle-inactive'}>WO</span>
-    </button>
-  );
-}
-
-function MarketplaceContent() {
+export default function DashboardMarketplacePage() {
   const { t } = useLanguage();
   
   // Data states
@@ -76,6 +62,19 @@ function MarketplaceContent() {
       }
     }
     loadData();
+  }, []);
+
+  // Pre-fill user data from session
+  useEffect(() => {
+    const s = getSession();
+    if (s) {
+      setCheckoutForm(prev => ({
+        ...prev,
+        name: s.name || '',
+        phone: s.phone || '',
+        address: s.store?.address || ''
+      }));
+    }
   }, []);
 
   // Cart actions
@@ -262,27 +261,9 @@ function MarketplaceContent() {
   });
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg-secondary)', paddingBottom: 80 }}>
+    <div style={{ padding: 16, background: 'var(--bg-secondary)', minHeight: 'calc(100vh - var(--nav-height) - var(--bottom-nav-height))' }}>
       {/* Styles local inject */}
       <style dangerouslySetInnerHTML={{ __html: `
-        .marketplace-navbar {
-          position: sticky;
-          top: 0;
-          z-index: 100;
-          background: rgba(255, 255, 255, 0.7);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
-          border-bottom: 1px solid var(--border);
-          padding-top: env(safe-area-inset-top, 0px);
-          height: 64px;
-          display: flex;
-          align-items: center;
-        }
-        @media (prefers-color-scheme: dark) {
-          .marketplace-navbar {
-            background: rgba(11, 15, 25, 0.8);
-          }
-        }
         .search-container {
           background: var(--surface);
           border: 1px solid var(--border);
@@ -306,8 +287,8 @@ function MarketplaceContent() {
           display: flex;
           gap: 8px;
           overflow-x: auto;
-          padding: 4px 16px 12px;
-          margin: 0 -16px;
+          padding: 4px 0 12px;
+          margin-bottom: 12px;
           scrollbar-width: none;
         }
         .category-scroll::-webkit-scrollbar {
@@ -333,20 +314,23 @@ function MarketplaceContent() {
         .marketplace-hero {
           background: var(--gradient-hero);
           color: white;
-          padding: 40px 16px;
+          padding: 32px 16px;
           text-align: center;
           position: relative;
           overflow: hidden;
-          margin-bottom: 24px;
+          margin-bottom: 20px;
+          border-radius: var(--radius-lg);
+          box-shadow: var(--shadow-md);
         }
-        .marketplace-hero h1 {
-          font-size: 2rem;
+        .marketplace-hero h2 {
+          font-size: 1.75rem;
           font-weight: 900;
           font-family: var(--font-display);
-          margin-bottom: 8px;
+          margin-bottom: 6px;
+          color: white;
         }
         .marketplace-hero p {
-          font-size: 0.9375rem;
+          font-size: 0.875rem;
           opacity: 0.9;
           max-width: 500px;
           margin: 0 auto;
@@ -405,246 +389,192 @@ function MarketplaceContent() {
         }
       `}} />
 
-      {/* Navbar */}
-      <nav className="marketplace-navbar">
-        <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px' }}>
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text)' }}>
-            <IconArrowLeft size={20} />
-            <span style={{ fontSize: '1.0625rem', fontWeight: 800 }}>TEKBIZ</span>
-          </Link>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <LangToggle />
-            {cart.length > 0 && (
-              <button 
-                onClick={() => setShowCart(true)} 
-                className="btn btn-ghost" 
-                style={{ 
-                  position: 'relative', 
-                  width: 36, 
-                  height: 36, 
-                  borderRadius: '50%', 
-                  background: 'var(--surface)', 
-                  border: '1px solid var(--border)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-              >
-                <IconShoppingCart size={18} />
-                <span 
-                  style={{ 
-                    position: 'absolute', 
-                    top: -4, 
-                    right: -4, 
-                    background: 'var(--primary)', 
-                    color: 'white', 
-                    fontSize: '0.625rem', 
-                    fontWeight: 800, 
-                    borderRadius: '50%', 
-                    width: 18, 
-                    height: 18, 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center' 
-                  }}
-                >
-                  {cartCount}
-                </span>
-              </button>
-            )}
-          </div>
-        </div>
-      </nav>
-
       {/* Hero Header */}
       <div className="marketplace-hero">
         <div className="gradient-glow-1" style={{ top: '0%', right: '10%' }} />
-        <h1>{t('marketplace')}</h1>
+        <h2>{t('marketplace')}</h2>
         <p>{t('exploreProducts')}</p>
       </div>
 
-      {/* Search & Filters Controls */}
-      <div className="container" style={{ padding: '0 16px' }}>
-        {/* Search Field */}
-        <div className="search-container">
-          <IconSearch size={18} color="var(--text-tertiary)" />
-          <input 
-            type="text" 
-            className="search-input" 
-            placeholder={t('searchPlaceholder')}
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-          />
-          {search && (
-            <button onClick={() => setSearch('')} style={{ color: 'var(--text-tertiary)', fontWeight: 'bold' }}>✕</button>
-          )}
-        </div>
-
-        {/* Dynamic Category Scroll */}
-        <div className="category-scroll">
-          <button 
-            onClick={() => setSelectedCategory('')} 
-            className={`category-pill ${selectedCategory === '' ? 'active' : ''}`}
-          >
-            {t('filterCategory')}
-          </button>
-          {categories.map(cat => (
-            <button 
-              key={cat} 
-              onClick={() => setSelectedCategory(cat)} 
-              className={`category-pill ${selectedCategory === cat ? 'active' : ''}`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-
-        {/* Filters Toolbar */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-            {/* Store select filter */}
-            <select 
-              value={selectedStore} 
-              onChange={e => setSelectedStore(e.target.value)}
-              className="filter-select"
-            >
-              <option value="">{t('allStores')}</option>
-              {stores.map(st => (
-                <option key={st.id} value={st.id}>{st.name}</option>
-              ))}
-            </select>
-
-            {/* Sort Select */}
-            <select 
-              value={sortBy} 
-              onChange={e => setSortBy(e.target.value)}
-              className="filter-select"
-            >
-              <option value="newest">Plus récent</option>
-              <option value="price_asc">Prix : Bas à Élevé</option>
-              <option value="price_desc">Prix : Élevé à Bas</option>
-            </select>
-          </div>
-
-          <button 
-            onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-            className="btn btn-ghost"
-            style={{ fontSize: '0.8125rem', padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 4, background: 'var(--surface)', border: '1px solid var(--border)' }}
-          >
-            Filtres de prix <IconChevronDown size={14} style={{ transform: showAdvancedFilters ? 'rotate(180deg)' : 'none', transition: 'all 0.2s' }} />
-          </button>
-        </div>
-
-        {/* Collapsing Advanced Filters panel */}
-        {showAdvancedFilters && (
-          <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', padding: 16, marginBottom: 20, display: 'flex', gap: 12, alignItems: 'center' }}>
-            <div style={{ flex: 1 }}>
-              <label style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: 4 }}>Prix minimum (FCFA)</label>
-              <input 
-                type="number" 
-                className="input" 
-                style={{ padding: 8, height: 38 }}
-                value={minPrice}
-                onChange={e => setMinPrice(e.target.value)} 
-                placeholder="Ex: 1000"
-              />
-            </div>
-            <div style={{ flex: 1 }}>
-              <label style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: 4 }}>Prix maximum (FCFA)</label>
-              <input 
-                type="number" 
-                className="input" 
-                style={{ padding: 8, height: 38 }}
-                value={maxPrice}
-                onChange={e => setMaxPrice(e.target.value)} 
-                placeholder="Ex: 50000"
-              />
-            </div>
-            <button 
-              onClick={() => { setMinPrice(''); setMaxPrice(''); }}
-              className="btn btn-ghost btn-sm"
-              style={{ alignSelf: 'flex-end', height: 38 }}
-            >
-              Réinitialiser
-            </button>
-          </div>
-        )}
-
-        {/* Products Grid */}
-        {loading ? (
-          <div style={{ display: 'flex', justifyContent: 'center', padding: '80px 0', color: 'var(--text-secondary)' }}>
-            Chargement de la marketplace...
-          </div>
-        ) : (
-          <>
-            <div className="product-grid">
-              {sortedProducts.map((p, i) => (
-                <div key={p.id} className="product-card" onClick={() => setSelectedProduct(p)} style={{ cursor: 'pointer' }}>
-                  <div className="product-card-img" style={{ background: bgColors[i % bgColors.length], display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', overflow: 'hidden', position: 'relative' }}>
-                    {p.images && p.images.length > 0 ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={p.images[0]} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    ) : (
-                      <IconShoppingBag size={36} />
-                    )}
-                    {p.category && (
-                      <span style={{ position: 'absolute', top: 8, left: 8, background: 'rgba(0,0,0,0.6)', color: 'white', fontSize: '0.625rem', fontWeight: 700, padding: '2px 8px', borderRadius: '100px' }}>
-                        {p.category}
-                      </span>
-                    )}
-                  </div>
-                  <div className="product-card-body">
-                    <div className="product-card-name">{p.name}</div>
-                    
-                    {/* Link to Store */}
-                    <div className="product-store-link">
-                      <div className="product-store-logo">
-                        {p.store.logo ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img src={p.store.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                        ) : (
-                          p.store.name.substring(0, 1).toUpperCase()
-                        )}
-                      </div>
-                      <span onClick={(e) => {
-                        e.stopPropagation();
-                        window.location.href = `/shop/${p.store.slug}`;
-                      }} style={{ textDecoration: 'underline', cursor: 'pointer' }}>
-                        {p.store.name}
-                      </span>
-                    </div>
-
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 }}>
-                      <div className="product-card-price">{formatCFA(p.price)} F</div>
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          addToCart(p);
-                        }} 
-                        className="btn btn-primary"
-                        style={{ width: 28, height: 28, padding: 0, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                      >
-                        <IconShoppingCart size={14} />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {sortedProducts.length === 0 && (
-              <div style={{ textAlign: 'center', padding: '60px 16px', color: 'var(--text-tertiary)' }}>
-                Aucun produit ne correspond à vos filtres de recherche.
-              </div>
-            )}
-          </>
+      {/* Search Field */}
+      <div className="search-container">
+        <IconSearch size={18} color="var(--text-tertiary)" />
+        <input 
+          type="text" 
+          className="search-input" 
+          placeholder={t('searchPlaceholder')}
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+        />
+        {search && (
+          <button onClick={() => setSearch('')} style={{ color: 'var(--text-tertiary)', fontWeight: 'bold' }}>✕</button>
         )}
       </div>
 
-      {/* Floating Bottom Cart trigger */}
+      {/* Dynamic Category Scroll */}
+      <div className="category-scroll">
+        <button 
+          onClick={() => setSelectedCategory('')} 
+          className={`category-pill ${selectedCategory === '' ? 'active' : ''}`}
+        >
+          {t('filterCategory')}
+        </button>
+        {categories.map(cat => (
+          <button 
+            key={cat} 
+            onClick={() => setSelectedCategory(cat)} 
+            className={`category-pill ${selectedCategory === cat ? 'active' : ''}`}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
+
+      {/* Filters Toolbar */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+          {/* Store select filter */}
+          <select 
+            value={selectedStore} 
+            onChange={e => setSelectedStore(e.target.value)}
+            className="filter-select"
+          >
+            <option value="">{t('allStores')}</option>
+            {stores.map(st => (
+              <option key={st.id} value={st.id}>{st.name}</option>
+            ))}
+          </select>
+
+          {/* Sort Select */}
+          <select 
+            value={sortBy} 
+            onChange={e => setSortBy(e.target.value)}
+            className="filter-select"
+          >
+            <option value="newest">Plus récent</option>
+            <option value="price_asc">Prix : Bas à Élevé</option>
+            <option value="price_desc">Prix : Élevé à Bas</option>
+          </select>
+        </div>
+
+        <button 
+          onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+          className="btn btn-ghost"
+          style={{ fontSize: '0.8125rem', padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 4, background: 'var(--surface)', border: '1px solid var(--border)' }}
+        >
+          Filtres de prix <IconChevronDown size={14} style={{ transform: showAdvancedFilters ? 'rotate(180deg)' : 'none', transition: 'all 0.2s' }} />
+        </button>
+      </div>
+
+      {/* Collapsing Advanced Filters panel */}
+      {showAdvancedFilters && (
+        <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', padding: 16, marginBottom: 20, display: 'flex', gap: 12, alignItems: 'center' }}>
+          <div style={{ flex: 1 }}>
+            <label style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: 4 }}>Prix minimum (FCFA)</label>
+            <input 
+              type="number" 
+              className="input" 
+              style={{ padding: 8, height: 38 }}
+              value={minPrice}
+              onChange={e => setMinPrice(e.target.value)} 
+              placeholder="Ex: 1000"
+            />
+          </div>
+          <div style={{ flex: 1 }}>
+            <label style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: 4 }}>Prix maximum (FCFA)</label>
+            <input 
+              type="number" 
+              className="input" 
+              style={{ padding: 8, height: 38 }}
+              value={maxPrice}
+              onChange={e => setMaxPrice(e.target.value)} 
+              placeholder="Ex: 50000"
+            />
+          </div>
+          <button 
+            onClick={() => { setMinPrice(''); setMaxPrice(''); }}
+            className="btn btn-ghost btn-sm"
+            style={{ alignSelf: 'flex-end', height: 38 }}
+          >
+            Réinitialiser
+          </button>
+        </div>
+      )}
+
+      {/* Products Grid */}
+      {loading ? (
+        <div style={{ display: 'flex', justifyContent: 'center', padding: '80px 0', color: 'var(--text-secondary)' }}>
+          Chargement de la marketplace...
+        </div>
+      ) : (
+        <>
+          <div className="product-grid">
+            {sortedProducts.map((p, i) => (
+              <div key={p.id} className="product-card" onClick={() => setSelectedProduct(p)} style={{ cursor: 'pointer' }}>
+                <div className="product-card-img" style={{ background: bgColors[i % bgColors.length], display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', overflow: 'hidden', position: 'relative' }}>
+                  {p.images && p.images.length > 0 ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={p.images[0]} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    <IconShoppingBag size={36} />
+                  )}
+                  {p.category && (
+                    <span style={{ position: 'absolute', top: 8, left: 8, background: 'rgba(0,0,0,0.6)', color: 'white', fontSize: '0.625rem', fontWeight: 700, padding: '2px 8px', borderRadius: '100px' }}>
+                      {p.category}
+                    </span>
+                  )}
+                </div>
+                <div className="product-card-body">
+                  <div className="product-card-name">{p.name}</div>
+                  
+                  {/* Link to Store */}
+                  <div className="product-store-link">
+                    <div className="product-store-logo">
+                      {p.store.logo ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={p.store.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      ) : (
+                        p.store.name.substring(0, 1).toUpperCase()
+                      )}
+                    </div>
+                    <span onClick={(e) => {
+                      e.stopPropagation();
+                      window.location.href = `/shop/${p.store.slug}`;
+                    }} style={{ textDecoration: 'underline', cursor: 'pointer' }}>
+                      {p.store.name}
+                    </span>
+                  </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 }}>
+                    <div className="product-card-price">{formatCFA(p.price)} F</div>
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        addToCart(p);
+                      }} 
+                      className="btn btn-primary"
+                      style={{ width: 28, height: 28, padding: 0, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    >
+                      <IconShoppingCart size={14} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {sortedProducts.length === 0 && (
+            <div style={{ textAlign: 'center', padding: '60px 16px', color: 'var(--text-tertiary)' }}>
+              Aucun produit ne correspond à vos filtres de recherche.
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Floating Bottom Cart trigger - positioned ABOVE the bottom navigation bar */}
       {cart.length > 0 && !showCart && !selectedProduct && !showCheckout && !orderDone && (
-        <div style={{ position: 'fixed', bottom: 20, left: 16, right: 16, zIndex: 50 }}>
-          <button onClick={() => setShowCart(true)} className="btn btn-primary btn-full btn-lg" style={{ justifyContent: 'space-between', fontSize: '0.9375rem', gap: 8 }}>
+        <div style={{ position: 'fixed', bottom: 'calc(var(--bottom-nav-height) + 16px)', left: 16, right: 16, zIndex: 50 }}>
+          <button onClick={() => setShowCart(true)} className="btn btn-primary btn-full btn-lg" style={{ justifyContent: 'space-between', fontSize: '0.9375rem', gap: 8, boxShadow: 'var(--shadow-lg)' }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><IconShoppingCart size={18} /> Panier ({cartCount})</span>
             <span>{formatCFA(cartTotal)} F</span>
           </button>
@@ -655,7 +585,7 @@ function MarketplaceContent() {
       {selectedProduct && (
         <>
           <div className="modal-overlay" onClick={() => setSelectedProduct(null)} />
-          <div className="bottom-sheet">
+          <div className="bottom-sheet" style={{ zIndex: 110 }}>
             <div className="bottom-sheet-handle" />
             <div style={{ width: '100%', height: 200, background: bgColors[products.indexOf(selectedProduct) % bgColors.length], borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16, color: '#94a3b8', overflow: 'hidden', position: 'relative' }}>
               {selectedProduct.images && selectedProduct.images.length > 0 ? (
@@ -692,7 +622,7 @@ function MarketplaceContent() {
       {showCart && (
         <>
           <div className="modal-overlay" onClick={() => setShowCart(false)} />
-          <div className="bottom-sheet" style={{ maxHeight: '85vh', overflowY: 'auto' }}>
+          <div className="bottom-sheet" style={{ maxHeight: '80vh', overflowY: 'auto', zIndex: 110 }}>
             <div className="bottom-sheet-handle" />
             <h4 style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
               <IconShoppingCart size={18} /> Panier ({cartCount} articles)
@@ -748,7 +678,7 @@ function MarketplaceContent() {
       {showCheckout && (
         <>
           <div className="modal-overlay" onClick={() => setShowCheckout(false)} />
-          <div className="bottom-sheet" style={{ maxHeight: '85vh', overflowY: 'auto' }}>
+          <div className="bottom-sheet" style={{ maxHeight: '80vh', overflowY: 'auto', zIndex: 110 }}>
             <div className="bottom-sheet-handle" />
             <h4 style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
               <IconClipboard size={18} /> Finaliser la commande
@@ -855,7 +785,7 @@ function MarketplaceContent() {
       {orderDone && (
         <>
           <div className="modal-overlay" onClick={() => setOrderDone(false)} />
-          <div className="bottom-sheet" style={{ textAlign: 'center' }}>
+          <div className="bottom-sheet" style={{ textAlign: 'center', zIndex: 110 }}>
             <div className="bottom-sheet-handle" />
             <div style={{ marginBottom: 12, color: 'var(--success)', display: 'flex', justifyContent: 'center' }}>
               <IconCheckCircle size={64} />
@@ -880,17 +810,9 @@ function MarketplaceContent() {
       )}
 
       {/* Footer */}
-      <div style={{ textAlign: 'center', padding: '40px 16px 0', fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
+      <div style={{ textAlign: 'center', padding: '40px 16px 0', fontSize: '0.75rem', color: 'var(--text-tertiary)', paddingBottom: 24 }}>
         Propulsé par <span style={{ fontWeight: 700, background: 'var(--gradient-primary)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>TEKBIZ</span>
       </div>
     </div>
-  );
-}
-
-export default function MarketplacePage() {
-  return (
-    <LanguageProvider>
-      <MarketplaceContent />
-    </LanguageProvider>
   );
 }
