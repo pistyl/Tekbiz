@@ -97,6 +97,26 @@ export default function DashboardMarketplacePage() {
     setSelectedProduct(null);
   };
 
+  const handleBuyNow = (product) => {
+    setCart(prev => {
+      const existing = prev.find(i => i.id === product.id);
+      if (existing) {
+        return prev;
+      }
+      return [...prev, { 
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        images: product.images,
+        storeId: product.store.id,
+        storeName: product.store.name,
+        qty: 1
+      }];
+    });
+    setSelectedProduct(null);
+    setShowCheckout(true);
+  };
+
   const removeFromCart = (id) => setCart(prev => prev.filter(i => i.id !== id));
   const updateQty = (id, delta) => setCart(prev => prev.map(i => i.id === id ? { ...i, qty: Math.max(1, i.qty + delta) } : i));
   
@@ -611,9 +631,14 @@ export default function DashboardMarketplacePage() {
               {selectedProduct.description || 'Aucune description disponible.'}
             </p>
             
-            <button onClick={() => addToCart(selectedProduct)} className="btn btn-primary btn-full btn-lg" style={{ gap: 8 }}>
-              <IconShoppingCart size={18} /> Ajouter au panier
-            </button>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <button onClick={() => handleBuyNow(selectedProduct)} className="btn btn-primary btn-full btn-lg" style={{ gap: 8 }}>
+                <IconClipboard size={18} /> Commander directement
+              </button>
+              <button onClick={() => addToCart(selectedProduct)} className="btn btn-secondary btn-full btn-lg" style={{ gap: 8 }}>
+                <IconShoppingCart size={18} /> Ajouter au panier
+              </button>
+            </div>
           </div>
         </>
       )}

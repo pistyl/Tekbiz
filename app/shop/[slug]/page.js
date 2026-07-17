@@ -23,6 +23,7 @@ export default function ShopPage() {
   const [orderNumber, setOrderNumber] = useState('');
   const [checkoutForm, setCheckoutForm] = useState({ name: '', phone: '', address: '', payment: 'delivery' });
   const [isOwner, setIsOwner] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     async function loadShop() {
@@ -38,10 +39,13 @@ export default function ShopPage() {
           console.error('Failed to load shop:', error);
         }
 
-        // Vérifier si l'utilisateur est le propriétaire de la boutique
+        // Vérifier si l'utilisateur est connecté et s'il est le propriétaire
         const session = getSession();
-        if (session?.store?.slug === params.slug) {
-          setIsOwner(true);
+        if (session) {
+          setIsLoggedIn(true);
+          if (session.store?.slug === params.slug) {
+            setIsOwner(true);
+          }
         }
       }
       setLoading(false);
@@ -161,7 +165,7 @@ export default function ShopPage() {
       >
         {/* Bouton de retour */}
         <a 
-          href={isOwner ? '/dashboard/store' : '/'}
+          href={isOwner ? '/dashboard/store' : isLoggedIn ? '/dashboard/marketplace' : '/'}
           style={{
             position: 'absolute',
             top: 'calc(env(safe-area-inset-top, 0px) + 16px)',
