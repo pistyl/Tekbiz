@@ -128,6 +128,12 @@ export async function DELETE(request) {
       return NextResponse.json({ error: 'id est requis' }, { status: 400 });
     }
 
+    // 1. Supprimer les OrderItems associés (historique des lignes de commande) pour éviter l'erreur de clé étrangère
+    await prisma.orderItem.deleteMany({
+      where: { productId: id }
+    });
+
+    // 2. Supprimer ensuite le produit
     await prisma.product.delete({
       where: { id }
     });
