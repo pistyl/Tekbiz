@@ -42,7 +42,10 @@ function Navbar() {
         <Link href="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
           <span style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--primary)', letterSpacing: '-0.02em' }}>TEKBIZ</span>
         </Link>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <Link href="/marketplace" style={{ fontSize: '0.875rem', fontWeight: 650, color: 'var(--text-secondary)', transition: 'color 0.2s' }}>
+            {t('marketplace')}
+          </Link>
           <LangToggle />
           <Link href="/login" className="btn btn-primary" style={{ padding: '8px 16px', borderRadius: '100px', fontSize: '0.8125rem' }}>
             {t('commencer')}
@@ -83,8 +86,8 @@ function HeroSection() {
               <Link href="/register" className="btn btn-primary btn-hero">
                 {t('startFree')}
               </Link>
-              <Link href="#demo" className="btn btn-secondary btn-hero">
-                {t('seeDemo')}
+              <Link href="/marketplace" className="btn btn-secondary btn-hero">
+                {t('marketplace')}
               </Link>
             </div>
 
