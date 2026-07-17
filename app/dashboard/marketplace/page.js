@@ -605,7 +605,7 @@ export default function DashboardMarketplacePage() {
       {selectedProduct && (
         <>
           <div className="modal-overlay" onClick={() => setSelectedProduct(null)} />
-          <div className="bottom-sheet" style={{ zIndex: 110 }}>
+          <div className="bottom-sheet" style={{ zIndex: 210 }}>
             <div className="bottom-sheet-handle" />
             <div style={{ width: '100%', height: 200, background: bgColors[products.indexOf(selectedProduct) % bgColors.length], borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16, color: '#94a3b8', overflow: 'hidden', position: 'relative' }}>
               {selectedProduct.images && selectedProduct.images.length > 0 ? (
@@ -647,7 +647,7 @@ export default function DashboardMarketplacePage() {
       {showCart && (
         <>
           <div className="modal-overlay" onClick={() => setShowCart(false)} />
-          <div className="bottom-sheet" style={{ maxHeight: '80vh', overflowY: 'auto', zIndex: 110 }}>
+          <div className="bottom-sheet" style={{ maxHeight: '80vh', overflowY: 'auto', zIndex: 210 }}>
             <div className="bottom-sheet-handle" />
             <h4 style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
               <IconShoppingCart size={18} /> Panier ({cartCount} articles)
@@ -703,7 +703,7 @@ export default function DashboardMarketplacePage() {
       {showCheckout && (
         <>
           <div className="modal-overlay" onClick={() => setShowCheckout(false)} />
-          <div className="bottom-sheet" style={{ maxHeight: '80vh', overflowY: 'auto', zIndex: 110 }}>
+          <div className="bottom-sheet" style={{ maxHeight: '80vh', overflowY: 'auto', zIndex: 210 }}>
             <div className="bottom-sheet-handle" />
             <h4 style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
               <IconClipboard size={18} /> Finaliser la commande
@@ -810,7 +810,7 @@ export default function DashboardMarketplacePage() {
       {orderDone && (
         <>
           <div className="modal-overlay" onClick={() => setOrderDone(false)} />
-          <div className="bottom-sheet" style={{ textAlign: 'center', zIndex: 110 }}>
+          <div className="bottom-sheet" style={{ textAlign: 'center', zIndex: 210 }}>
             <div className="bottom-sheet-handle" />
             <div style={{ marginBottom: 12, color: 'var(--success)', display: 'flex', justifyContent: 'center' }}>
               <IconCheckCircle size={64} />
