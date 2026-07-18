@@ -407,24 +407,6 @@ export default function DashboardMarketplacePage() {
           align-items: center;
           gap: 6px;
         }
-        
-        /* Overrides to increase image size in marketplace */
-        .product-grid {
-          grid-template-columns: repeat(2, 1fr) !important;
-        }
-        @media (min-width: 768px) {
-          .product-grid {
-            grid-template-columns: repeat(3, 1fr) !important;
-          }
-        }
-        @media (min-width: 1024px) {
-          .product-grid {
-            grid-template-columns: repeat(3, 1fr) !important;
-          }
-        }
-        .product-card-img {
-          aspect-ratio: 4 / 5 !important;
-        }
       `}} />
 
       {/* Hero Header */}
@@ -625,7 +607,7 @@ export default function DashboardMarketplacePage() {
           <div className="modal-overlay" onClick={() => setSelectedProduct(null)} />
           <div className="bottom-sheet" style={{ zIndex: 210 }}>
             <div className="bottom-sheet-handle" />
-            <div style={{ width: '100%', height: 280, background: bgColors[products.indexOf(selectedProduct) % bgColors.length], borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16, color: '#94a3b8', overflow: 'hidden', position: 'relative' }}>
+            <div style={{ width: '100%', height: 200, background: bgColors[products.indexOf(selectedProduct) % bgColors.length], borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16, color: '#94a3b8', overflow: 'hidden', position: 'relative' }}>
               {selectedProduct.images && selectedProduct.images.length > 0 ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={selectedProduct.images[0]} alt={selectedProduct.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
