@@ -6,6 +6,10 @@ export async function POST(request) {
   try {
     const { items, customerName, customerPhone, customerAddress, storeId, paymentMethod } = await request.json();
 
+    if (paymentMethod !== 'delivery') {
+      return NextResponse.json({ error: 'Seul le paiement à la livraison est disponible pour les commandes pour le moment.' }, { status: 400 });
+    }
+
     if (!storeId || !customerName || !customerPhone || !items || items.length === 0) {
       return NextResponse.json({ error: 'Informations de commande incomplètes' }, { status: 400 });
     }

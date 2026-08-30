@@ -62,7 +62,7 @@ export async function POST(request) {
         customerName,
         customerPhone,
         customerAddress,
-        paymentMethod,
+        paymentMethod: paymentMethod || 'delivery',
         paymentStatus: 'PENDING',
         status: 'PENDING',
         storeId,

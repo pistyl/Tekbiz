@@ -354,68 +354,47 @@ export default function ShopPage() {
                 <input className="input" placeholder="Quartier, Ville" value={checkoutForm.address} onChange={e => setCheckoutForm(p => ({ ...p, address: e.target.value }))} required />
               </div>
               <div className="input-group">
-                <label>Payer avec</label>
+                <label>Moyen de paiement</label>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   <button type="button" onClick={() => setCheckoutForm(p => ({ ...p, payment: 'delivery' }))}
                     style={{ 
                       width: '100%', 
                       padding: '14px 12px', 
                       borderRadius: 'var(--radius-md)', 
-                      border: `2px solid ${checkoutForm.payment === 'delivery' ? 'var(--primary)' : 'var(--border)'}`, 
-                      background: checkoutForm.payment === 'delivery' ? '#EFF6FF' : 'var(--surface)', 
+                      border: '2px solid var(--primary)', 
+                      background: '#EFF6FF', 
                       fontSize: '0.875rem', 
                       fontWeight: 650, 
                       transition: 'all 0.2s', 
                       display: 'flex', 
                       alignItems: 'center', 
-                      gap: 10,
-                      color: checkoutForm.payment === 'delivery' ? 'var(--primary)' : 'var(--text)'
+                      justifyContent: 'space-between',
+                      color: 'var(--primary)'
                     }}>
-                    <IconClipboard size={18} /> À la livraison
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <IconClipboard size={18} /> Paiement à la livraison
+                    </div>
+                    <span style={{ fontSize: '0.6875rem', background: 'var(--primary)', color: 'white', padding: '2px 8px', borderRadius: 'var(--radius-full)' }}>Actif</span>
                   </button>
-                  <button type="button" onClick={() => setCheckoutForm(p => ({ ...p, payment: 'wave' }))}
-                    style={{ 
-                      width: '100%', 
-                      padding: '14px 12px', 
-                      borderRadius: 'var(--radius-md)', 
-                      border: `2px solid ${checkoutForm.payment === 'wave' ? '#00A3E0' : 'var(--border)'}`, 
-                      background: checkoutForm.payment === 'wave' ? '#EFF6FF' : 'var(--surface)', 
-                      fontSize: '0.875rem', 
-                      fontWeight: 650, 
-                      transition: 'all 0.2s', 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      gap: 10,
-                      color: checkoutForm.payment === 'wave' ? '#00A3E0' : 'var(--text)'
-                    }}>
-                    <IconWaveLogo size={18} /> Wave
-                  </button>
-                  <button type="button" onClick={() => setCheckoutForm(p => ({ ...p, payment: 'orange_money' }))}
-                    style={{ 
-                      width: '100%', 
-                      padding: '14px 12px', 
-                      borderRadius: 'var(--radius-md)', 
-                      border: `2px solid ${checkoutForm.payment === 'orange_money' ? '#FF6600' : 'var(--border)'}`, 
-                      background: checkoutForm.payment === 'orange_money' ? '#FFF7ED' : 'var(--surface)', 
-                      fontSize: '0.875rem', 
-                      fontWeight: 650, 
-                      transition: 'all 0.2s', 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      gap: 10,
-                      color: checkoutForm.payment === 'orange_money' ? '#FF6600' : 'var(--text)'
-                    }}>
-                    <IconOrangeMoneyLogo size={18} /> Orange Money
-                  </button>
+
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <div style={{ flex: 1, padding: '10px 12px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)', background: 'var(--bg-secondary)', opacity: 0.6, fontSize: '0.8125rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'not-allowed' }}>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#00A3E0', fontWeight: 600 }}><IconWaveLogo size={16} /> Wave</span>
+                      <span style={{ fontSize: '0.6875rem', background: 'var(--border)', color: 'var(--text-tertiary)', padding: '2px 6px', borderRadius: 4 }}>Bientôt</span>
+                    </div>
+                    <div style={{ flex: 1, padding: '10px 12px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)', background: 'var(--bg-secondary)', opacity: 0.6, fontSize: '0.8125rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'not-allowed' }}>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#FF6600', fontWeight: 600 }}><IconOrangeMoneyLogo size={16} /> Orange</span>
+                      <span style={{ fontSize: '0.6875rem', background: 'var(--border)', color: 'var(--text-tertiary)', padding: '2px 6px', borderRadius: 4 }}>Bientôt</span>
+                    </div>
+                  </div>
                 </div>
               </div>
               <div style={{ background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)', padding: 14, display: 'flex', justifyContent: 'space-between', fontWeight: 700 }}>
-                <span>{checkoutForm.payment === 'delivery' ? 'Total de la commande' : 'Total à payer'}</span>
+                <span>Total de la commande</span>
                 <span style={{ color: 'var(--primary)', fontSize: '1.125rem' }}>{formatCFA(cartTotal)} F</span>
               </div>
               <button type="submit" className="btn btn-primary btn-full btn-lg" disabled={orderLoading}>
-                {orderLoading ? 'Traitement en cours...' : 
-                 checkoutForm.payment === 'delivery' ? `Valider la commande ( ${formatCFA(cartTotal)} F ) →` : `Payer ${formatCFA(cartTotal)} F →`}
+                {orderLoading ? 'Traitement en cours...' : `Valider la commande ( ${formatCFA(cartTotal)} F ) →`}
               </button>
             </form>
           </div>

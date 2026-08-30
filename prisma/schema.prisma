@@ -12,47 +12,47 @@ model User {
   name      String
   email     String   @unique
   phone     String
-  password  String   // Hashé avec bcrypt
-  store     Store?
+  password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  store     Store?
 }
 
 model Store {
-  id          String    @id @default(cuid())
-  name        String
-  slug        String    @unique
-  description String?
-  logo        String?
-  banner      String?
-  category    String?
-  phone       String
-  address     String?
-  isActive    Boolean   @default(true)
-  plan        String    @default("FREE")
+  id              String    @id @default(cuid())
+  name            String
+  slug            String    @unique
+  description     String?
+  logo            String?
+  banner          String?
+  category        String?
+  phone           String
+  address         String?
+  isActive        Boolean   @default(true)
+  plan            String    @default("FREE")
   subscriptionEnd DateTime?
-  userId      String    @unique
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  products    Product[]
-  orders      Order[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  userId          String    @unique
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  orders          Order[]
+  products        Product[]
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Product {
   id          String      @id @default(cuid())
   name        String
   description String?
-  price       Int         // Prix en FCFA
+  price       Int
   images      String[]
   category    String?
   inStock     Boolean     @default(true)
   quantity    Int         @default(0)
   storeId     String
-  store       Store       @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  orderItems  OrderItem[]
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
+  orderItems  OrderItem[]
+  store       Store       @relation(fields: [storeId], references: [id], onDelete: Cascade)
 }
 
 model Order {
@@ -63,14 +63,14 @@ model Order {
   customerName    String
   customerPhone   String
   customerAddress String?
-  paymentMethod   String        // "wave" | "orange_money"
+  paymentMethod   String
   paymentStatus   PaymentStatus @default(PENDING)
-  paymentRef      String?       // Référence PayTech
+  paymentRef      String?
   storeId         String
-  store           Store         @relation(fields: [storeId], references: [id])
-  items           OrderItem[]
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
+  store           Store         @relation(fields: [storeId], references: [id])
+  items           OrderItem[]
 }
 
 model OrderItem {
@@ -78,9 +78,9 @@ model OrderItem {
   quantity  Int
   price     Int
   productId String
-  product   Product @relation(fields: [productId], references: [id])
   orderId   String
   order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id])
 }
 
 enum OrderStatus {

@@ -738,60 +738,34 @@ export default function DashboardMarketplacePage() {
                       width: '100%', 
                       padding: '14px 12px', 
                       borderRadius: 'var(--radius-md)', 
-                      border: `2px solid ${checkoutForm.payment === 'delivery' ? 'var(--primary)' : 'var(--border)'}`, 
-                      background: checkoutForm.payment === 'delivery' ? '#EFF6FF' : 'var(--surface)', 
+                      border: '2px solid var(--primary)', 
+                      background: '#EFF6FF', 
                       fontSize: '0.875rem', 
                       fontWeight: 650, 
                       transition: 'all 0.2s', 
                       display: 'flex', 
                       alignItems: 'center', 
-                      gap: 10,
-                      color: checkoutForm.payment === 'delivery' ? 'var(--primary)' : 'var(--text)'
+                      justifyContent: 'space-between',
+                      color: 'var(--primary)'
                     }}>
-                    <IconClipboard size={18} /> À la livraison
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <IconClipboard size={18} /> Paiement à la livraison
+                    </div>
+                    <span style={{ fontSize: '0.6875rem', background: 'var(--primary)', color: 'white', padding: '2px 8px', borderRadius: 'var(--radius-full)' }}>Actif</span>
                   </button>
-                  <button type="button" onClick={() => setCheckoutForm(p => ({ ...p, payment: 'wave' }))}
-                    style={{ 
-                      width: '100%', 
-                      padding: '14px 12px', 
-                      borderRadius: 'var(--radius-md)', 
-                      border: `2px solid ${checkoutForm.payment === 'wave' ? '#00A3E0' : 'var(--border)'}`, 
-                      background: checkoutForm.payment === 'wave' ? '#EFF6FF' : 'var(--surface)', 
-                      fontSize: '0.875rem', 
-                      fontWeight: 650, 
-                      transition: 'all 0.2s', 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      gap: 10,
-                      color: checkoutForm.payment === 'wave' ? '#00A3E0' : 'var(--text)'
-                    }}>
-                    <IconWaveLogo size={18} /> Wave
-                  </button>
-                  <button type="button" onClick={() => setCheckoutForm(p => ({ ...p, payment: 'orange_money' }))}
-                    style={{ 
-                      width: '100%', 
-                      padding: '14px 12px', 
-                      borderRadius: 'var(--radius-md)', 
-                      border: `2px solid ${checkoutForm.payment === 'orange_money' ? '#FF6600' : 'var(--border)'}`, 
-                      background: checkoutForm.payment === 'orange_money' ? '#FFF7ED' : 'var(--surface)', 
-                      fontSize: '0.875rem', 
-                      fontWeight: 650, 
-                      transition: 'all 0.2s', 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      gap: 10,
-                      color: checkoutForm.payment === 'orange_money' ? '#FF6600' : 'var(--text)'
-                    }}>
-                    <IconOrangeMoneyLogo size={18} /> Orange Money
-                  </button>
+
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <div style={{ flex: 1, padding: '10px 12px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)', background: 'var(--bg-secondary)', opacity: 0.6, fontSize: '0.8125rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'not-allowed' }}>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#00A3E0', fontWeight: 600 }}><IconWaveLogo size={16} /> Wave</span>
+                      <span style={{ fontSize: '0.6875rem', background: 'var(--border)', color: 'var(--text-tertiary)', padding: '2px 6px', borderRadius: 4 }}>Bientôt</span>
+                    </div>
+                    <div style={{ flex: 1, padding: '10px 12px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)', background: 'var(--bg-secondary)', opacity: 0.6, fontSize: '0.8125rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'not-allowed' }}>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#FF6600', fontWeight: 600 }}><IconOrangeMoneyLogo size={16} /> Orange</span>
+                      <span style={{ fontSize: '0.6875rem', background: 'var(--border)', color: 'var(--text-tertiary)', padding: '2px 6px', borderRadius: 4 }}>Bientôt</span>
+                    </div>
+                  </div>
                 </div>
               </div>
-
-              {checkoutForm.payment !== 'delivery' && hasMultipleStoresInCart && (
-                <div style={{ background: '#FFFBEB', border: '1px solid #FDE68A', color: '#B45309', borderRadius: 'var(--radius-md)', padding: 12, fontSize: '0.75rem', lineHeight: 1.4 }}>
-                  ⚠️ Le paiement en ligne par Wave / OM sera initié pour la première boutique ({Object.values(cartGrouped)[0]?.storeName}). Les articles des autres boutiques seront validés avec paiement à la livraison.
-                </div>
-              )}
 
               <div style={{ background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)', padding: 14, display: 'flex', justifyContent: 'space-between', fontWeight: 700 }}>
                 <span>Total de la commande</span>
