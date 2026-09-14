@@ -6,7 +6,7 @@ import {
   IconRocket, IconZap, IconWallet, IconChart, IconEdit, 
   IconCamera, IconParty, IconHome, IconPackage, IconClipboard, 
   IconDollar, IconUser, IconCheck, IconEye, IconGlobe, IconChevronDown,
-  IconCheckCircle
+  IconCheckCircle, IconWhatsApp
 } from '@/lib/icons';
 
 function LangToggle() {
@@ -50,6 +50,23 @@ function Navbar() {
         </div>
       </div>
     </nav>
+  );
+}
+
+function WhatsAppButton() {
+  const whatsappUrl = "https://wa.me/221762639829?text=Bonjour%20TEKBIZ%2C%20j%27aimerais%20avoir%20des%20informations";
+
+  return (
+    <a 
+      href={whatsappUrl} 
+      target="_blank" 
+      rel="noopener noreferrer" 
+      className="whatsapp-float-btn"
+      title="Support WhatsApp (+221 76 263 98 29)"
+      aria-label="Support WhatsApp"
+    >
+      <IconWhatsApp size={32} color="white" />
+    </a>
   );
 }
 
@@ -1757,6 +1774,30 @@ function LandingContent() {
             justify-content: flex-start;
           }
         }
+        .whatsapp-float-btn {
+          position: fixed;
+          bottom: 24px;
+          right: 24px;
+          width: 58px;
+          height: 58px;
+          background: linear-gradient(135deg, #25D366, #128C7E);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 8px 24px rgba(37, 211, 102, 0.45);
+          z-index: 9999;
+          transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          cursor: pointer;
+          text-decoration: none;
+        }
+        .whatsapp-float-btn:hover {
+          transform: scale(1.12);
+          box-shadow: 0 12px 30px rgba(37, 211, 102, 0.65);
+        }
+        .whatsapp-float-btn:active {
+          transform: scale(0.95);
+        }
       `}} />
 
       <Navbar />
@@ -1767,6 +1808,7 @@ function LandingContent() {
       <PricingSection />
       <FaqSection />
       <Footer />
+      <WhatsAppButton />
     </>
   );
 }
