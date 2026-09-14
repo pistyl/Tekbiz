@@ -21,46 +21,46 @@ function StoreSettings() {
   const [upgrading, setUpgrading] = useState(false);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [subMethod, setSubMethod] = useState('wave');
+  const [storeDetail, setStoreDetail] = useState(null);
 
   const [form, setForm] = useState({
     name: '', slug: '', description: '', phone: '', address: '', category: '', logo: '', banner: ''
   });
 
-  useEffect(() => {
-    if (planStatus === 'success') {
-      setShowSuccessAlert(true);
-      router.replace('/dashboard/store');
+  const refreshStoreData = async (storeId, currentSession) => {
+    try {
+      const targetId = storeId || currentSession?.store?.id;
+      if (!targetId) return;
+      const res = await fetch(`/api/store?storeId=${targetId}`, { cache: 'no-store' });
+      const data = await res.json();
+      if (data.success && data.store) {
+        setStoreDetail(data.store);
+        const updated = { ...currentSession, store: data.store };
+        localStorage.setItem('tekbiz_session', JSON.stringify(updated));
+        setSession(updated);
+        window.dispatchEvent(new Event('tekbiz-session-update'));
+        setForm(p => ({
+          ...p,
+          logo: data.store.logo || '',
+          banner: data.store.banner || '',
+          name: data.store.name || '',
+          slug: data.store.slug || '',
+          description: data.store.description || '',
+          phone: formatToE164(data.store.phone || currentSession?.phone || ''),
+          address: data.store.address || '',
+          category: data.store.category || '',
+        }));
+      }
+    } catch (err) {
+      console.error('Refresh store error:', err);
     }
-  }, [planStatus, router]);
+  };
 
   useEffect(() => {
     const s = getSession();
     if (s?.store) {
       setSession(s);
-      
-      // Fetch fresh shop information to make sure the plan status is correct
-      fetch(`/api/shop/${s.store.slug}`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.success && data.store) {
-            const updated = { ...s, store: data.store };
-            localStorage.setItem('tekbiz_session', JSON.stringify(updated));
-            setSession(updated);
-            setForm(p => ({
-              ...p,
-              logo: data.store.logo || '',
-              banner: data.store.banner || '',
-              name: data.store.name || '',
-              slug: data.store.slug || '',
-              description: data.store.description || '',
-              phone: formatToE164(data.store.phone || s.phone || ''),
-              address: data.store.address || '',
-              category: data.store.category || '',
-            }));
-          }
-        })
-        .catch(err => console.error(err));
-
+      refreshStoreData(s.store.id, s);
       setForm({
         name: s.store.name || '',
         slug: s.store.slug || '',
@@ -73,6 +73,17 @@ function StoreSettings() {
       });
     }
   }, []);
+
+  useEffect(() => {
+    if (planStatus === 'success') {
+      setShowSuccessAlert(true);
+      const s = getSession();
+      if (s?.store?.id) {
+        refreshStoreData(s.store.id, s);
+      }
+      router.replace('/dashboard/store');
+    }
+  }, [planStatus, router]);
 
   const update = (k, v) => setForm(p => ({ ...p, [k]: v }));
 
@@ -171,7 +182,7 @@ function StoreSettings() {
       });
       const result = await res.json();
       if (result.success && result.redirectUrl) {
-        window.open(result.redirectUrl, '_blank');
+        window.location.href = result.redirectUrl;
       } else {
         alert(result.error || 'Erreur lors de l\'initiation de l\'abonnement');
       }
@@ -349,7 +360,7 @@ function StoreSettings() {
         <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: 20 }}>
           <h4 style={{ margin: 0, fontSize: '0.875rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>Plan & Facturation</h4>
           
-          {session?.store?.plan === 'PRO' ? (
+          {(storeDetail?.plan === 'PRO' || session?.store?.plan === 'PRO') ? (
             <div style={{ background: '#D1FAE5', border: '1px solid #10B981', borderRadius: 'var(--radius-md)', padding: 14, display: 'flex', alignItems: 'center', gap: 10, color: '#065F46' }}>
               <IconCheck size={20} />
               <div>

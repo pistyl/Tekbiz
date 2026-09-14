@@ -19,10 +19,13 @@ export async function POST(request) {
     }
 
     const body = JSON.parse(rawBody);
-    const { event, reference, status, transaction_id } = body;
+    const { event, reference, order_id, status, transaction_id } = body;
 
-    if (event === 'payment_completed' && status === 'completed') {
-      const orderId = reference;
+    const normalizedStatus = String(status || '').toLowerCase();
+    const isSuccess = normalizedStatus === 'completed' || normalizedStatus === 'success' || event === 'payment_completed' || event === 'payment.success';
+
+    if (isSuccess) {
+      const orderId = reference || order_id;
 
       if (orderId && orderId.startsWith('SUB_')) {
         const storeId = orderId.substring(4);
@@ -34,7 +37,7 @@ export async function POST(request) {
           }
         });
         console.log(`Plan PRO activé pour la boutique : ${storeId}`);
-      } else {
+      } else if (orderId) {
         // Mettre à jour le statut de la commande en base de données
         await prisma.order.update({
           where: { id: orderId },
