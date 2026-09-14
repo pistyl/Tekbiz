@@ -19,6 +19,10 @@ export default function AdminDashboard() {
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedMonth, setSelectedMonth] = useState('');
 
+  // États pour les actions Admin
+  const [updatingStoreId, setUpdatingStoreId] = useState(null);
+  const [toastMessage, setToastMessage] = useState('');
+
   // Initialiser les dates par défaut
   useEffect(() => {
     const today = new Date().toISOString().split('T')[0];
@@ -73,6 +77,45 @@ export default function AdminDashboard() {
     setRawStats(null);
     setStores([]);
     setPasscode('');
+  };
+
+  const handleTogglePro = async (storeId, action) => {
+    const token = sessionStorage.getItem('tekbiz_admin_token');
+    if (!token) return;
+
+    setUpdatingStoreId(storeId);
+    try {
+      const res = await fetch('/api/admin/toggle-pro', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ storeId, action, durationDays: 30 })
+      });
+      const data = await res.json();
+      if (data.success && data.store) {
+        setStores(prev => prev.map(s => {
+          if (s.id === storeId) {
+            return {
+              ...s,
+              plan: data.store.plan,
+              subscriptionEnd: data.store.subscriptionEnd
+            };
+          }
+          return s;
+        }));
+        setToastMessage(action === 'SET_FREE' ? 'Plan repassé en GRATUIT' : 'Plan PRO activé/prolongé (+30 jours)');
+        setTimeout(() => setToastMessage(''), 3500);
+      } else {
+        alert(data.error || 'Erreur lors de la mise à jour du plan');
+      }
+    } catch (err) {
+      console.error('Toggle pro failed:', err);
+      alert('Erreur réseau lors de la mise à jour');
+    } finally {
+      setUpdatingStoreId(null);
+    }
   };
 
   // Helper pour vérifier si une date appartient à la période d'analyse
@@ -537,6 +580,7 @@ export default function AdminDashboard() {
                   <th style={{ padding: '12px 10px' }}>Commandes</th>
                   <th style={{ padding: '12px 10px' }}>Statut Plan</th>
                   <th style={{ padding: '12px 10px' }}>Expiration Pro</th>
+                  <th style={{ padding: '12px 10px', textAlign: 'right' }}>Actions PRO</th>
                 </tr>
               </thead>
               <tbody style={{ fontSize: '0.875rem' }}>
@@ -580,6 +624,67 @@ export default function AdminDashboard() {
                       <td style={{ padding: '14px 10px', color: isProExpired ? '#ef4444' : '#94a3b8' }}>
                         {s.subscriptionEnd ? new Date(s.subscriptionEnd).toLocaleDateString('fr-FR') : '—'}
                       </td>
+                      <td style={{ padding: '14px 10px', textAlign: 'right' }}>
+                        {s.plan === 'FREE' || isProExpired ? (
+                          <button
+                            onClick={() => handleTogglePro(s.id, 'ACTIVATE_PRO')}
+                            disabled={updatingStoreId === s.id}
+                            style={{
+                              background: '#10b981',
+                              color: 'white',
+                              border: 'none',
+                              padding: '6px 12px',
+                              borderRadius: 6,
+                              fontSize: '0.75rem',
+                              fontWeight: 700,
+                              cursor: 'pointer',
+                              transition: 'all 0.2s',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: 6
+                            }}
+                          >
+                            {updatingStoreId === s.id ? '...' : '⚡ Activer PRO'}
+                          </button>
+                        ) : (
+                          <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
+                            <button
+                              onClick={() => handleTogglePro(s.id, 'EXTEND_PRO')}
+                              disabled={updatingStoreId === s.id}
+                              style={{
+                                background: '#3b82f620',
+                                color: '#60a5fa',
+                                border: '1px solid #3b82f640',
+                                padding: '5px 10px',
+                                borderRadius: 6,
+                                fontSize: '0.75rem',
+                                fontWeight: 600,
+                                cursor: 'pointer'
+                              }}
+                              title="Prolonger de 30 jours"
+                            >
+                              {updatingStoreId === s.id ? '...' : '+30j'}
+                            </button>
+                            <button
+                              onClick={() => handleTogglePro(s.id, 'SET_FREE')}
+                              disabled={updatingStoreId === s.id}
+                              style={{
+                                background: '#ef444420',
+                                color: '#f87171',
+                                border: '1px solid #ef444440',
+                                padding: '5px 10px',
+                                borderRadius: 6,
+                                fontSize: '0.75rem',
+                                fontWeight: 600,
+                                cursor: 'pointer'
+                              }}
+                              title="Passer en compte gratuit"
+                            >
+                              Désactiver
+                            </button>
+                          </div>
+                        )}
+                      </td>
                     </tr>
                   );
                 })}
@@ -596,6 +701,28 @@ export default function AdminDashboard() {
           </div>
         </div>
       </main>
+
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div style={{
+          position: 'fixed',
+          bottom: 24,
+          right: 24,
+          background: '#10b981',
+          color: 'white',
+          padding: '12px 20px',
+          borderRadius: 10,
+          fontWeight: 700,
+          fontSize: '0.875rem',
+          boxShadow: '0 10px 25px rgba(16, 185, 129, 0.4)',
+          zIndex: 9999,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8
+        }}>
+          ✓ {toastMessage}
+        </div>
+      )}
     </div>
   );
 }
