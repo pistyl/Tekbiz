@@ -169,8 +169,8 @@ export default function AdminDashboard() {
     ? rawStats.users.filter(u => isDateInPeriod(u.createdAt)).length 
     : 0;
 
-  // 3. Chiffre d'affaires abonnements perçus sur la période (5 000 FCFA par Pro)
-  const periodSubscriptionRevenue = periodProStoresCount * 5000;
+  // 3. Chiffre d'affaires abonnements perçus sur la période (2 400 FCFA par Pro)
+  const periodSubscriptionRevenue = periodProStoresCount * 2400;
 
   // --- FILTRAGE DE LA TABLE DES BOUTIQUES ---
   const filteredStores = stores.filter(s => {
@@ -218,7 +218,7 @@ export default function AdminDashboard() {
         return sd === dateStr && s.plan === 'PRO';
       }).length;
 
-      const daySubscriptionRevenue = dayProStores * 5000;
+      const daySubscriptionRevenue = dayProStores * 2400;
 
       list.push({ label, revenue: daySubscriptionRevenue });
     }
@@ -226,11 +226,11 @@ export default function AdminDashboard() {
   };
 
   const chartData = getChartData();
-  const maxRevenue = Math.max(...chartData.map(d => d.revenue), 5000);
+  const maxRevenue = Math.max(...chartData.map(d => d.revenue), 2400);
 
   // Cumul total historique des abonnements
   const totalProStores = stores.filter(s => s.plan === 'PRO').length;
-  const cumulativeSubscriptionRevenue = totalProStores * 5000;
+  const cumulativeSubscriptionRevenue = totalProStores * 2400;
 
   if (!isUnlocked) {
     return (

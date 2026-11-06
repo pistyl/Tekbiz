@@ -15,7 +15,7 @@ export async function POST(request) {
 
     const orderId = `SUB_${storeId}`;
     const payment = await createPayment({
-      amount: 5000,
+      amount: 2400,
       description: 'Abonnement Pro TEKBIZ',
       orderId,
       customerName: customerName || 'Propriétaire Boutique',

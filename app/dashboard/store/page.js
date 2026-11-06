@@ -401,7 +401,7 @@ function StoreSettings() {
 
                 <h3 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: 4 }}>Pro</h3>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 16 }}>
-                  <span style={{ fontSize: '1.75rem', fontWeight: 900, fontFamily: 'var(--font-display)' }}>5 000</span>
+                  <span style={{ fontSize: '1.75rem', fontWeight: 900, fontFamily: 'var(--font-display)' }}>2 400</span>
                   <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>FCFA/mois</span>
                 </div>
 

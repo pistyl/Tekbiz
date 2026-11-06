@@ -38,8 +38,8 @@ export async function GET(request) {
     const proStoresCount = stores.filter(s => s.plan === 'PRO').length;
     const freeStoresCount = stores.length - proStoresCount;
 
-    // Revenus d'abonnements : 5 000 FCFA par boutique PRO active
-    const subscriptionMRR = proStoresCount * 5000;
+    // Revenus d'abonnements : 2 400 FCFA par boutique PRO active
+    const subscriptionMRR = proStoresCount * 2400;
 
     return NextResponse.json({
       success: true,

@@ -463,10 +463,10 @@ function PricingSection() {
             <div>
               <h3 className="plan-name">{t('proPlan')}</h3>
               <div className="plan-price">
-                {billingAnnually ? '4 000' : '5 000'}{' '}
+                {billingAnnually ? '1 920' : '2 400'}{' '}
                 <span className="price-unit">FCFA / {t('perMonth')}</span>
               </div>
-              {billingAnnually && <div className="yearly-billed-text">48 000 FCFA {t('billedYearly')}</div>}
+              {billingAnnually && <div className="yearly-billed-text">23 040 FCFA {t('billedYearly')}</div>}
               <div className="plan-features">
                 {[
                   t('unlimitedProducts'), 
