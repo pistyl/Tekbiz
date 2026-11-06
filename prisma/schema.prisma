@@ -37,6 +37,8 @@ model Store {
   orders          Order[]
   products        Product[]
   user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([plan])
 }
 
 model Product {
@@ -53,6 +55,9 @@ model Product {
   updatedAt   DateTime    @updatedAt
   orderItems  OrderItem[]
   store       Store       @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@index([storeId])
+  @@index([createdAt])
 }
 
 model Order {
@@ -71,6 +76,10 @@ model Order {
   updatedAt       DateTime      @updatedAt
   store           Store         @relation(fields: [storeId], references: [id])
   items           OrderItem[]
+
+  @@index([storeId])
+  @@index([createdAt])
+  @@index([paymentStatus])
 }
 
 model OrderItem {
@@ -81,6 +90,9 @@ model OrderItem {
   orderId   String
   order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product   Product @relation(fields: [productId], references: [id])
+
+  @@index([orderId])
+  @@index([productId])
 }
 
 enum OrderStatus {

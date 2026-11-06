@@ -534,7 +534,7 @@ export default function DashboardMarketplacePage() {
                 <div className="product-card-img" style={{ background: bgColors[i % bgColors.length], display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', overflow: 'hidden', position: 'relative' }}>
                   {p.images && p.images.length > 0 ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={p.images[0]} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <img src={p.images[0]} alt={p.name} loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   ) : (
                     <IconShoppingBag size={36} />
                   )}
@@ -552,7 +552,7 @@ export default function DashboardMarketplacePage() {
                     <div className="product-store-logo">
                       {p.store.logo ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={p.store.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <img src={p.store.logo} alt="" loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       ) : (
                         p.store.name.substring(0, 1).toUpperCase()
                       )}
@@ -610,7 +610,7 @@ export default function DashboardMarketplacePage() {
             <div style={{ width: '100%', height: 200, background: bgColors[products.indexOf(selectedProduct) % bgColors.length], borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16, color: '#94a3b8', overflow: 'hidden', position: 'relative' }}>
               {selectedProduct.images && selectedProduct.images.length > 0 ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={selectedProduct.images[0]} alt={selectedProduct.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img src={selectedProduct.images[0]} alt={selectedProduct.name} loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
                 <IconShoppingBag size={64} />
               )}

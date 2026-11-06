@@ -18,7 +18,14 @@ export async function GET(request, { params }) {
       return NextResponse.json({ error: 'Boutique introuvable' }, { status: 404 });
     }
 
-    return NextResponse.json({ success: true, store, products: store.products });
+    return NextResponse.json(
+      { success: true, store, products: store.products },
+      {
+        headers: {
+          'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=120'
+        }
+      }
+    );
   } catch (error) {
     console.error('Fetch shop error:', error);
     return NextResponse.json({ error: 'Erreur lors du chargement de la boutique' }, { status: 500 });

@@ -163,6 +163,8 @@ function DashboardShell({ children }) {
             <img 
               src={session.store.logo} 
               alt="Logo boutique" 
+              loading="lazy"
+              decoding="async"
               style={{ width: 36, height: 36, borderRadius: 'var(--radius-md)', objectFit: 'cover', border: '1px solid var(--border)' }} 
             />
           ) : (

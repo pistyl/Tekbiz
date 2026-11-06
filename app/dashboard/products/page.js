@@ -84,7 +84,7 @@ export default function ProductsPage() {
               <div className="product-card-img" style={{ background: bgColors[i % bgColors.length], display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', overflow: 'hidden', position: 'relative' }}>
                 {product.images && product.images.length > 0 ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={product.images[0]} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <img src={product.images[0]} alt={product.name} loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 ) : (
                   <IconPackage size={36} />
                 )}
